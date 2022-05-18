@@ -7,4 +7,6 @@ Combustion analysis in a coal-fired power plant
 3. Open VSCode or other editor in project directory or simply run `code .`
 4. Run `source ./bin/activate`
 5. Run `pip install -r requirements.txt`
-6. Everything should be ready, run program with `python main.py` or by running with **PLAY** icon in your editor
+6. Everything should be ready, run program with `python main.py` or by running with **PLAY** icon in your editor[1]
+
+[1]*If you have code-runner extension installed.*
