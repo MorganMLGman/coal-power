@@ -1,8 +1,8 @@
 # coal-power
 Combustion analysis in a coal-fired power plant
 
-## Instalation and usage
-### Instalation
+## Installation and usage
+### Installation
 1. Run `git clone https://github.com/MorganMLGman/coal-power.git ./coal-power` or `git clone git@github.com:MorganMLGman/coal-power.git ./coal-power`
 2. Run `cd coal-power`
 3. Open VSCode in project directory or simply run `code .`
