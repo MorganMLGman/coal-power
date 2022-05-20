@@ -17,4 +17,6 @@ Combustion analysis in a coal-fired power plant
 2. Run `git fetch`
 3. Run `git pull`
 4. Run `source ./venv/bin/activate`
-5. Click **RUN ALL** in VSCode 
+5. Check if Jupyter is in virtual environment
+   image.png
+6. Click **RUN ALL** in VSCode 
