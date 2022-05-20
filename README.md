@@ -7,10 +7,11 @@ Combustion analysis in a coal-fired power plant
 2. Run `cd coal-power`
 3. Open VSCode in project directory or simply run `code .`
 4. Install VSCode extension `Jupyter`
-5. Run `source ./venv/bin/activate`
-6. Run `pip install -r requirements.txt`
-7. Everything should be ready, run program by clicking **RUN ALL** button in your editor
-8. In a popup choose Python interpreter version, should be something like `./venv Virtual Env`
+5. Create Python Virtual Environment by running `python -m venv venv`
+6. Run `source ./venv/bin/activate`
+7. Run `pip install -r requirements.txt`
+8. Everything should be ready, run program by clicking **RUN ALL** button in your editor
+9. In a popup choose Python interpreter version, should be something like `./venv Virtual Env`
 
 ### Usage
 1. Open VSCode in project directory or run `code .`
