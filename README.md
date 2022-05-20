@@ -16,5 +16,5 @@ Combustion analysis in a coal-fired power plant
 1. Open VSCode in project directory or run `code .`
 2. Run `git fetch`
 3. Run `git pull`
-4. Run `source ./bin/activate`
+4. Run `source ./venv/bin/activate`
 5. Click **RUN ALL** in VSCode 
