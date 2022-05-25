@@ -1,6 +1,3 @@
-# %% [markdown]
-# # Combustion analysis in a coal-fired power plant
-
 # %%
 import pandas as pd
 import numpy as np
@@ -14,21 +11,6 @@ import seaborn as sns
 DATA_FILE = "a08r.mat"
 ARRAY_NAME = "a08r"
 SPS = 8192 # Samples per second
-
-# %% [markdown]
-# ### findMaximum
-# Funkcja służąca do wyszukiwanie punktów maksimum w otrzymanych danych
-# 
-# Parametry:
-# - data: dataFrame z danymi, cały niezmodyfikowany
-# - column: nazwa kolumny w której chcemy szukać
-# - width: minimalna szerokość (x) piku
-# - distance: minimlna odległość (x) pomiędzy szukanymi punktami
-# - threshold: minimlna/maksymalna odległość (y) pomiędzy szukanymi punktami
-# - prominence: eeee, to nie wiem, ale czasami jak większe to pomaga eliminować podwójne punkty
-#   
-# Zwraca listę z punktami maksimum
-# 
 
 # %%
 def findMaximums(data: pd.DataFrame, column: str, width: int = 10, distance: int = SPS*45, threshold: list = None, prominence: float = 0.1) -> list:
@@ -48,17 +30,6 @@ def findMaximums(data: pd.DataFrame, column: str, width: int = 10, distance: int
     ret = []
     ret = find_peaks(data[column], width=width, distance=distance, threshold=threshold, prominence=prominence)[0].tolist()
     return ret  
-
-# %% [markdown]
-# ### dataSplit
-# Funkcja służąca do podziału danych na podzbiory, według podanej listy podziału. Przykładowo dla punktów podziału 1, 2, 3, zwraca przedziały [1, 2], [2, 3]
-# 
-# Parametry:
-# - data: dataFrame z danymi, cały niezmodyfikowany
-# - spliter: lista, wykorzystywana do podziału
-# - channel: nazwa kanału, który ma zostać zpisany, `all` jeżeli wszystkie
-#   
-# Zwraca dataFrame z przedziałami
 
 # %%
 def dataSplit(data: pd.DataFrame, spliter: list, channel: str = "all") -> (pd.DataFrame, list):
@@ -125,16 +96,6 @@ def drawDescriptiveStats(bucket: pd.Series, name: str, stats: dict, size_x: int,
     plt.legend()
     plt.show()
 
-# %% [markdown]
-# ## Korelacja
-# Funkcja służąca do wyliczenia korelacji pomiędzy wszystkimi pięcioma kanałami
-# 
-# **Argumenty**:
-# - data (pd.DataFrame): dane wejściowe, w przypadku naszego projektu jest to cały dataset
-# 
-# **Zwracane dane**:
-# - pd.DataFrame: Wyliczona korelacja pomiędzy wszystkimi kanałami w formie tabeli, tutaj pd.DataFrame
-
 # %%
 def correlation(data: pd.DataFrame) -> pd.DataFrame:
     """Funkcja służąca do wyliczenia korelacji pomiędzy wszystkimi pięcioma kanałami
@@ -148,17 +109,6 @@ def correlation(data: pd.DataFrame) -> pd.DataFrame:
     corr = data.corr(method="pearson")
     return corr
 
-
-# %% [markdown]
-# ## correlationHeatmap
-# Metoda pozwalająca narysować mapę cieplną korelacji pomiędzy kanałamia
-# 
-# **Argumenty**:
-# - calculated_correlation (pd.DataFrame): obliczona korelacja jako dane wejściowe potrzebne zbudowania wykresu, tutaj powinien być to wynik metody correlation()
-# - title (str): Tytuł wyświetlany na heatmapie
-# - font_size (int): Wielkość fonta tytułu heatmapy
-# 
-# %%
 
 # %%
 def correlationHeatmap(calculated_correlation: pd.DataFrame, title: str, font_size: int ):
@@ -216,3 +166,5 @@ if __name__ == "__main__":
     
     correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
     
+
+# %%
