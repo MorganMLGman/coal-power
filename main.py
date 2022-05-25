@@ -132,7 +132,7 @@ def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) ->
     Args:
         data (pd.Series): data to remove constant component
         method (str): method of removal (mean, roll, diff)
-        window (int): window size used in rolling method
+        window (int): window size used in rolling method and diff
 
     Returns:
         pd.Series: data 
@@ -149,9 +149,7 @@ def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) ->
             rolling = rolling.fillna(mean)
             ret = data.sub(rolling)
         case "diff":
-            ret = data.diff()
-            
-        
+            ret = data.diff(window)           
     return ret
 
 
@@ -161,11 +159,11 @@ if __name__ == "__main__":
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
     
     maximums_a08r_ch5 = findMaximums(data, "ch5", prominence=0.4) 
-
-
-    calculated_correlation = correlation(data)
+    splited_df, keys = dataSplit(data, maximums_a08r_ch5, "all")
     
-    correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
-    
+    plt.figure(figsize=(15, 8))
+    ne_data = removeConstComp(splited_df["ch5"], method="diff")
+    plt.plot(ne_data.values)
+    plt.show()
 
 # %%
