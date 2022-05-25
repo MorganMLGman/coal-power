@@ -174,6 +174,34 @@ def correlationHeatmap(calculated_correlation: pd.DataFrame, title: str, font_si
     map.set(xlabel="Channel", ylabel="Channel")
     map.set_title(title, fontsize=font_size)
 
+# %%
+def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) -> pd.Series:
+    """Function to remove contant component from pandas data series
+
+    Args:
+        data (pd.Series): data to remove constant component
+        method (str): method of removal (mean, roll, diff)
+        window (int): window size used in rolling method
+
+    Returns:
+        pd.Series: data 
+    """
+    ret = pd.Series()
+    
+    match method:
+        case "mean":
+            mean = data.mean()
+            ret = data.sub(mean)    
+        case "roll":
+            rolling = data.rolling(window).mean()
+            mean = data[0: rolling.first_valid_index() - 1].mean()
+            rolling = rolling.fillna(mean)
+            ret = data.sub(rolling)
+        case "diff":
+            ret = data.diff()
+            
+        
+    return ret
 
 
 # %%
