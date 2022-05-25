@@ -19,6 +19,7 @@ numpy==1.22.3
 packaging==21.3
 pandas==1.4.2
 parso==0.8.3
+patsy==0.5.2
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==9.1.1
@@ -32,8 +33,10 @@ python-dateutil==2.8.2
 pytz==2022.1
 pyzmq==23.0.0
 scipy==1.8.1
+seaborn==0.11.2
 six==1.16.0
 stack-data==0.2.0
+statsmodels==0.13.2
 tornado==6.1
 traitlets==5.2.1.post0
 wcwidth==0.2.5
