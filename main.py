@@ -152,6 +152,26 @@ def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) ->
             ret = data.diff(window)           
     return ret
 
+# %%
+def autocorrelation(data) -> dict:
+    ret = {}
+    
+    match type(data):
+        case pd.DataFrame:
+            for column in data.columns:
+                ret[column] = sm.tsa.acf(data[column], nlags=data[column].size)          
+        
+        case pd.Series:
+            if data.index.get_level_values(0).unique().dtype == 'object':
+                for bucket in data.index.get_level_values(0).unique():
+                    ret[bucket] = sm.tsa.acf(data[bucket], nlags=data[bucket].size)
+            else:
+                ret = sm.tsa.acf(data, nlags=data.size)
+                
+        case _:
+            pass
+        
+    return ret
 
 # %%
 if __name__ == "__main__":
@@ -161,9 +181,12 @@ if __name__ == "__main__":
     maximums_a08r_ch5 = findMaximums(data, "ch5", prominence=0.4) 
     splited_df, keys = dataSplit(data, maximums_a08r_ch5, "all")
     
-    plt.figure(figsize=(15, 8))
-    ne_data = removeConstComp(splited_df["ch5"], method="diff")
-    plt.plot(ne_data.values)
+    tmp = []
+    dane = autocorrelation(splited_df["ch5"]["bucket0"])
+    print(f"{dane.size}")
+    
+    plt.plot(dane)
     plt.show()
+    
 
 # %%
