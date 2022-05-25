@@ -123,6 +123,7 @@ def correlationHeatmap(calculated_correlation: pd.DataFrame, title: str, font_si
     map = sns.heatmap(calculated_correlation, square=True, linewidths=.2, annot=True, cbar_kws={"orientation": "horizontal"})
     map.set(xlabel="Channel", ylabel="Channel")
     map.set_title(title, fontsize=font_size)
+    plt.show()
 
 # %%
 def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) -> pd.Series:
