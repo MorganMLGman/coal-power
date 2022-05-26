@@ -202,7 +202,7 @@ if __name__ == "__main__":
     """
     # --------------------------
     start_time = perf_counter()
-    logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
+    logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
     logging.debug("Program beginning")
     # --------------------------
     
@@ -214,7 +214,7 @@ if __name__ == "__main__":
     dane = autocorrelation(data)
     logging.debug(f"{dane!r}")
     
-    plt.plot(dane)
+    plt.plot(dane, linewidth=0.3)
     plt.show()
     
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
