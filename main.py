@@ -1,4 +1,6 @@
 # %%
+import logging
+from time import perf_counter
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
@@ -27,6 +29,7 @@ def findMaximums(data: pd.DataFrame, column: str, width: int = 10, distance: int
     Returns:
         list: Zwraca listę z punktami maksimum
     """
+    logging.debug("Function: findMaximums")
     ret = []
     ret = find_peaks(data[column], width=width, distance=distance, threshold=threshold, prominence=prominence)[0].tolist()
     return ret  
@@ -43,28 +46,33 @@ def dataSplit(data: pd.DataFrame, spliter: list, channel: str = "all") -> (pd.Da
     Returns:
         pd.DataFrame: Zwraca dataFrame z przedziałami
     """
+    logging.debug("Function: dataSplit")
     ret = pd.DataFrame()
     num_of_buckets = len(spliter) - 1
     keys = [f"bucket{i}" for i in range(num_of_buckets)]
     tmp = []
     
     if "all" == channel:
+        logging.debug("Spliting all channels")
         for item in range(num_of_buckets):
             tmp.append(data[spliter[item]:(spliter[item + 1] - 1)])
         ret = pd.concat(tmp, keys=keys)
         
     elif channel in data.columns:
+        logging.debug(f"Spliting {channel}")
         for item in range(num_of_buckets):
             tmp.append(data[channel][spliter[item]:(spliter[item + 1] - 1)])
         ret = pd.concat(tmp, keys=keys)
         
     else:
+        logging.debug(f"Parameter channel is not valid")
         ret = None
         
     return ret, keys
 
 # %%
 def descriptiveStats(bucket: pd.Series) -> dict:
+    logging.debug("Function: descriptiveStats")
     ret = dict.fromkeys(["mean", "median", "min", "min_idx" "max", "max_idx", "std", "var", "auto_corr", "roll_mean"])
     
     ret["mean"] = bucket.mean()
@@ -82,6 +90,7 @@ def descriptiveStats(bucket: pd.Series) -> dict:
 
 # %%
 def drawDescriptiveStats(bucket: pd.Series, name: str, stats: dict, size_x: int, size_y: int) -> None:
+    logging.debug("Function: drawDescriptiveStats")
     plt.figure(figsize=(size_x, size_y))
     plt.title(name)
     plt.plot(bucket, label="Data")
@@ -106,6 +115,7 @@ def correlation(data: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Wyliczona korelacja pomiędzy wszystkimi kanałami w formie tabeli, tutaj pd.DataFrame
     """
+    logging.debug("Function: correlation")
     corr = data.corr(method="pearson")
     return corr
 
@@ -119,8 +129,9 @@ def correlationHeatmap(calculated_correlation: pd.DataFrame, title: str, font_si
         title (str): Tytuł wyświetlany na heatmapie
         font_size (int): Wielkość fonta tytułu heatmapy
     """
+    logging.debug("Function: correlationHeatmap")
     fig, ax = plt.subplots(figsize=(12,12))         # Sample figsize in inches
-    map = sns.heatmap(calculated_correlation, square=True, linewidths=.2, annot=True, cbar_kws={"orientation": "horizontal"})
+    map = sns.heatmap(calculated_correlation, square=True, linewidths=0.2, annot=True, cbar_kws={"orientation": "horizontal"})
     map.set(xlabel="Channel", ylabel="Channel")
     map.set_title(title, fontsize=font_size)
     plt.show()
@@ -137,8 +148,10 @@ def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) ->
     Returns:
         pd.Series: data 
     """
+    logging.debug("Function: removeConstComp")
     ret = pd.Series()
     
+    logging.debug(f"Method: {method}")
     match method:
         case "mean":
             mean = data.mean()
@@ -153,40 +166,58 @@ def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) ->
     return ret
 
 # %%
-def autocorrelation(data) -> dict:
-    ret = {}
-    
+def autocorrelation(data) -> pd.DataFrame:
+    logging.debug("Function: autocorrelation") 
     match type(data):
         case pd.DataFrame:
+            logging.debug("Provided data is pandas DataFrame")
+            ret = pd.DataFrame(columns= data.columns)
+            logging.debug(f"Data columns: {data.columns}")
             for column in data.columns:
-                ret[column] = sm.tsa.acf(data[column], nlags=data[column].size)          
+                ret[column] = pd.Series(sm.tsa.acf(data[column], nlags=data[column].size))                       
         
         case pd.Series:
+            logging.debug("Provided data is pandas Series")
             if data.index.get_level_values(0).unique().dtype == 'object':
+                logging.debug("Multiple buckets available")      
+                logging.debug(f"Data buckets: {data.index.get_level_values(0).unique()}")
+                ret = pd.DataFrame()
+                ret["total"] = pd.Series(sm.tsa.acf(data, nlags=data.size))
+                
                 for bucket in data.index.get_level_values(0).unique():
-                    ret[bucket] = sm.tsa.acf(data[bucket], nlags=data[bucket].size)
+                    ret[bucket] = pd.Series(sm.tsa.acf(data[bucket], nlags=data[bucket].size))
+                    
             else:
+                logging.debug("Single bucket available")  
                 ret = sm.tsa.acf(data, nlags=data.size)
                 
         case _:
-            pass
+            ret = None
         
     return ret
 
 # %%
 if __name__ == "__main__":
+    """Use logging insted of print for cleaner output
+    """
+    # --------------------------
+    start_time = perf_counter()
+    logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
+    logging.debug("Program beginning")
+    # --------------------------
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
     
     maximums_a08r_ch5 = findMaximums(data, "ch5", prominence=0.4) 
     splited_df, keys = dataSplit(data, maximums_a08r_ch5, "all")
-    
     tmp = []
-    dane = autocorrelation(splited_df["ch5"]["bucket0"])
-    print(f"{dane.size}")
+    dane = autocorrelation(data)
+    logging.debug(f"{dane!r}")
     
     plt.plot(dane)
     plt.show()
+    
+    logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
 
 # %%
