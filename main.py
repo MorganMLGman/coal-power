@@ -167,6 +167,14 @@ def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) ->
 
 # %%
 def autocorrelation(data) -> pd.DataFrame:
+    """Function calculates autocorrelation of given data
+
+    Args:
+        data (pd.DataFrame, pd.Series): data to calculate autocorrelation
+
+    Returns:
+        pd.DataFrame: autocorrelation series, multiple series if input data had multiple series
+    """
     logging.debug("Function: autocorrelation") 
     match type(data):
         case pd.DataFrame:
@@ -189,12 +197,15 @@ def autocorrelation(data) -> pd.DataFrame:
                     
             else:
                 logging.debug("Single bucket available")  
-                ret = sm.tsa.acf(data, nlags=data.size)
+                ret["total"] = sm.tsa.acf(data, nlags=data.size)
                 
         case _:
             ret = None
         
     return ret
+# %%
+def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", subplots: False = False) -> None:
+    pass
 
 # %%
 if __name__ == "__main__":
@@ -219,5 +230,4 @@ if __name__ == "__main__":
     
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
-
 # %%
