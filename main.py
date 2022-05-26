@@ -203,8 +203,10 @@ def autocorrelation(data) -> pd.DataFrame:
             ret = None
         
     return ret
+
 # %%
 def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", subplots: False = False) -> None:
+    logging.debug(f"Function: drawAutocorrelation")
     pass
 
 # %%
@@ -227,6 +229,8 @@ if __name__ == "__main__":
     
     plt.plot(dane, linewidth=0.3)
     plt.show()
+    
+    drawAutocorrelation(data)
     
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
