@@ -186,10 +186,10 @@ def autocorrelation(data) -> pd.DataFrame:
         
         case pd.Series:
             logging.debug("Provided data is pandas Series")
+            ret = pd.DataFrame()
             if data.index.get_level_values(0).unique().dtype == 'object':
                 logging.debug("Multiple buckets available")      
                 logging.debug(f"Data buckets: {data.index.get_level_values(0).unique()}")
-                ret = pd.DataFrame()
                 ret["total"] = pd.Series(sm.tsa.acf(data, nlags=data.size))
                 
                 for bucket in data.index.get_level_values(0).unique():
@@ -207,7 +207,9 @@ def autocorrelation(data) -> pd.DataFrame:
 # %%
 def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", subplots: False = False) -> None:
     logging.debug(f"Function: drawAutocorrelation")
-    pass
+    
+    print(data.columns)
+    
 
 # %%
 if __name__ == "__main__":
@@ -224,13 +226,9 @@ if __name__ == "__main__":
     maximums_a08r_ch5 = findMaximums(data, "ch5", prominence=0.4) 
     splited_df, keys = dataSplit(data, maximums_a08r_ch5, "all")
     tmp = []
-    dane = autocorrelation(data)
-    logging.debug(f"{dane!r}")
     
-    plt.plot(dane, linewidth=0.3)
-    plt.show()
-    
-    drawAutocorrelation(data)
+    dane = autocorrelation(splited_df["ch1"]["bucket1"])    
+    drawAutocorrelation(dane)
     
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
