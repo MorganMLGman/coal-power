@@ -1,9 +1,11 @@
 # %%
 import logging
 from time import perf_counter
+import matplotlib
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+from pyparsing import col
 from scipy.io import loadmat
 from scipy.signal import find_peaks
 import statsmodels.api as sm
@@ -205,19 +207,41 @@ def autocorrelation(data) -> pd.DataFrame:
     return ret
 
 # %%
-def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", subplots: False = False) -> None:
+def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", overlaid = False) -> None:
     logging.debug(f"Function: drawAutocorrelation")
+    logging.debug(data.columns)
     
-    print(data.columns)
+    min_value = -0.2
     
+    plt.figure(figsize=(15, 5))
+    if data.columns.size == 1:
+        logging.debug(f"Only one column")
+        plt.plot(data)
+    else:
+        for i, column in enumerate(data.columns, start= 1):            
+            if data[column].min() < min_value:
+                min_value = data[column].min()
+                
+        for i, column in enumerate(data.columns, start= 1):
+            logging.debug(f"Column {column}, index {i}")              
+            plt.subplot(1, data.columns.size, i)
+            plt.ylim(min_value, 1.0)  
+            plt.title(f"{name} {column}")
+            plt.plot(data[column])
+                
+        
+    plt.show()
 
 # %%
-if __name__ == "__main__":
+
+def main(args = None):
     """Use logging insted of print for cleaner output
     """
     # --------------------------
     start_time = perf_counter()
     logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+    logger = logging.getLogger("projekt")
+    logger.setLevel(logging.DEBUG)    
     logging.debug("Program beginning")
     # --------------------------
     
@@ -225,11 +249,12 @@ if __name__ == "__main__":
     
     maximums_a08r_ch5 = findMaximums(data, "ch5", prominence=0.4) 
     splited_df, keys = dataSplit(data, maximums_a08r_ch5, "all")
-    tmp = []
     
-    dane = autocorrelation(splited_df["ch1"]["bucket1"])    
+    dane = autocorrelation(splited_df["ch1"])    
     drawAutocorrelation(dane)
     
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
-    
+
+if __name__ == "__main__":
+  main()
 # %%
