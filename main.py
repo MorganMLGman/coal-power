@@ -1,9 +1,11 @@
 # %%
 import logging
 from time import perf_counter
+import matplotlib
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+from pyparsing import col
 from scipy.io import loadmat
 from scipy.signal import find_peaks
 import statsmodels.api as sm
@@ -167,6 +169,14 @@ def removeConstComp(data: pd.Series, method: str = "mean", window: int = SPS) ->
 
 # %%
 def autocorrelation(data) -> pd.DataFrame:
+    """Function calculates autocorrelation of given data
+
+    Args:
+        data (pd.DataFrame, pd.Series): data to calculate autocorrelation
+
+    Returns:
+        pd.DataFrame: autocorrelation series, multiple series if input data had multiple series
+    """
     logging.debug("Function: autocorrelation") 
     match type(data):
         case pd.DataFrame:
@@ -178,10 +188,10 @@ def autocorrelation(data) -> pd.DataFrame:
         
         case pd.Series:
             logging.debug("Provided data is pandas Series")
+            ret = pd.DataFrame()
             if data.index.get_level_values(0).unique().dtype == 'object':
                 logging.debug("Multiple buckets available")      
                 logging.debug(f"Data buckets: {data.index.get_level_values(0).unique()}")
-                ret = pd.DataFrame()
                 ret["total"] = pd.Series(sm.tsa.acf(data, nlags=data.size))
                 
                 for bucket in data.index.get_level_values(0).unique():
@@ -189,7 +199,7 @@ def autocorrelation(data) -> pd.DataFrame:
                     
             else:
                 logging.debug("Single bucket available")  
-                ret = sm.tsa.acf(data, nlags=data.size)
+                ret["total"] = sm.tsa.acf(data, nlags=data.size)
                 
         case _:
             ret = None
@@ -197,12 +207,68 @@ def autocorrelation(data) -> pd.DataFrame:
     return ret
 
 # %%
-if __name__ == "__main__":
+def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", overlaid = False, lineWidth: float = 1.0) -> None:
+    logging.debug(f"Function: drawAutocorrelation")
+    logging.debug(data.columns)
+    
+    min_value = -0.2    
+    for i, column in enumerate(data.columns, start= 1):            
+            if data[column].min() < min_value:
+                min_value = data[column].min()
+    
+    plt.figure(figsize=(15, 5))
+    if data.columns.size == 1:
+        logging.debug(f"Only one column")
+        plt.plot(data, linewidth=lineWidth)
+        plt.title(f"{name}")
+        plt.ylim(min_value, 1.0)
+        
+    else:        
+        logging.debug(f"Overlaid: {overlaid}")        
+        if overlaid:
+            if "total" in data.columns:
+                logging.debug(f"`total` is one of colums")
+                plt.subplot(1, 2, 1)
+                plt.plot(data["total"], linewidth=lineWidth)
+                plt.title(f"{name} total")
+                plt.ylim(min_value, 1.0)
+                
+                plt.subplot(1, 2, 2)
+                plt.title(f"""{name} {data.columns.where(data.columns != "total").dropna().values}""")
+                plt.ylim(min_value, 1.0)
+                
+                for column in data.columns.where(data.columns != "total").dropna().values:
+                    plt.plot(data[column], label=column, linewidth=lineWidth)
+                
+            else:
+                logging.debug(f"`total` is not one of colums")
+                
+                plt.title(f"""{name} {data.columns.values}""")
+                plt.ylim(min_value, 1.0)
+                
+                for column in data.columns:
+                    plt.plot(data[column], label=column, linewidth=lineWidth)
+        else:
+            for i, column in enumerate(data.columns, start= 1):
+                logging.debug(f"Column {column}, index {i}")              
+                plt.subplot(1, data.columns.size, i)
+                plt.ylim(min_value, 1.0)  
+                plt.title(f"{name} {column}")
+                plt.plot(data[column], linewidth=lineWidth)
+                
+    plt.legend()    
+    plt.show()
+
+# %%
+
+def main(args = None):
     """Use logging insted of print for cleaner output
     """
     # --------------------------
     start_time = perf_counter()
     logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+    logger = logging.getLogger("projekt")
+    logger.setLevel(logging.DEBUG)    
     logging.debug("Program beginning")
     # --------------------------
     
@@ -210,14 +276,12 @@ if __name__ == "__main__":
     
     maximums_a08r_ch5 = findMaximums(data, "ch5", prominence=0.4) 
     splited_df, keys = dataSplit(data, maximums_a08r_ch5, "all")
-    tmp = []
-    dane = autocorrelation(data)
-    logging.debug(f"{dane!r}")
     
-    plt.plot(dane, linewidth=0.3)
-    plt.show()
+    dane = autocorrelation(splited_df["ch1"]["bucket1"])    
+    drawAutocorrelation(dane, overlaid=True, lineWidth=0.5)
     
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
-    
 
+if __name__ == "__main__":
+  main()
 # %%
