@@ -9,6 +9,7 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks
 import statsmodels.api as sm
 import seaborn as sns
+from peakdetect import peakdetect
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -188,3 +189,19 @@ if __name__ == "__main__":
     
     correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
     
+# %%
+data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
+
+time_series=data["ch5"]    
+peaks = peakdetect(time_series, lookahead=10000) 
+
+higherPeaks = np.array(peaks[0])
+plt.figure(figsize=(19,9))
+plt.ylabel("Monthly Mean Total Sunspot Number")
+plt.xlabel("Month")
+plt.title("Peaks")
+plt.plot(time_series)
+plt.plot(higherPeaks[:,0], higherPeaks[:,1], 'ro')
+
+
+# %%
