@@ -10,6 +10,7 @@ from scipy.signal import find_peaks
 import statsmodels.api as sm
 import seaborn as sns
 from peakdetect import peakdetect
+import plotly.graph_objects as go
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -176,7 +177,6 @@ def correlationHeatmap(calculated_correlation: pd.DataFrame, title: str, font_si
     map.set_title(title, fontsize=font_size)
 
 
-
 # %%
 if __name__ == "__main__":
     
@@ -187,21 +187,22 @@ if __name__ == "__main__":
 
     calculated_correlation = correlation(data)
     
-    correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
+    # correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
+
+    peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
     
+
 # %%
-data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-
-time_series=data["ch5"]    
-peaks = peakdetect(time_series, lookahead=10000) 
-
-higherPeaks = np.array(peaks[0])
-plt.figure(figsize=(19,9))
-plt.ylabel("Monthly Mean Total Sunspot Number")
-plt.xlabel("Month")
-plt.title("Peaks")
-plt.plot(time_series)
-plt.plot(higherPeaks[:,0], higherPeaks[:,1], 'ro')
-
+def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
+    
+    
+    peaks = findMaximums(data, column)
+    plt.figure(figsize=(plot_width,plot_height))
+    plt.plot(data[column])
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+    plt.plot(data[column][peaks], "x") 
+    plt.show()
 
 # %%

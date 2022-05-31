@@ -45,6 +45,7 @@ peakdetect==1.1
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==9.1.1
+plotly==5.8.0
 prometheus-client==0.14.1
 prompt-toolkit==3.0.29
 psutil==5.9.0
@@ -69,6 +70,7 @@ six==1.16.0
 soupsieve==2.3.2.post1
 stack-data==0.2.0
 statsmodels==0.13.2
+tenacity==8.0.1
 terminado==0.15.0
 tinycss2==1.1.1
 tornado==6.1
