@@ -206,6 +206,14 @@ def autocorrelation(data) -> pd.DataFrame:
 
 # %%
 def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", overlaid = False, lineWidth: float = 1.0) -> None:
+    """drawAutocorrelation fuction draw plot of auto correlation of provided data
+
+    Args:
+        data (pd.DataFrame): data to plot
+        name (str, optional): title for plot. Defaults to "Autocorrelation".
+        overlaid (bool, optional): draw multiple plots on one image. Defaults to False.
+        lineWidth (float, optional): witdh of plot lines. Defaults to 1.0.
+    """
     logging.debug(f"Function: drawAutocorrelation")
     logging.debug(data.columns)
     
@@ -258,7 +266,20 @@ def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", overl
     plt.show()
 
 # %%
-def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: int = SPS) -> list:
+def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: int = SPS, order: int = 200, order2: int = 11, debug_draw: bool = False) -> list:
+    """findMinimumsByAutoCorr find minimums in data based on autocorrelation
+
+    Args:
+        data (pd.DataFrame): data to analyze
+        analyze_ch (str, optional): column from data to anazlyze. Defaults to "ch1".
+        window (int, optional): rolling window mean size. Defaults to SPS.
+        order (int, optional): samples to analyze, stage 1. Defaults to 200.
+        order2 (int, optional): samples to analyze, stage 2. Defaults to 11.
+        debug_draw (bool, optional): draw debug plot with minimums. Defaults to False.
+
+    Returns:
+        list: list of found minimums
+    """    
     logging.debug(f"Function: findMinimumsByAutoCorr")
     
     if not isinstance(data, pd.DataFrame):
@@ -271,21 +292,23 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
     
     acorr = autocorrelation(data[analyze_ch])
     abs_acorr = acorr.abs()
-    avr_abs_acorr = abs_acorr.rolling(window=5*window).mean() 
-    local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=100)[0]
-    print(local_min)
+    avr_abs_acorr = abs_acorr.rolling(window=window).mean() 
+    local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=order)[0]
+    logging.debug(f"Local min: {local_min}")
     
-    local_min2 =  argrelextrema(avr_abs_acorr["total"][local_min].values, np.less, order=10)[0]
+    local_min2 =  argrelextrema(avr_abs_acorr["total"][local_min].values, np.less, order=order2)[0]
+    logging.debug(f"Local min2: {local_min2}")
     
-    plt.figure(figsize=(15,5))
-    plt.plot(abs_acorr)
-    plt.plot(avr_abs_acorr)
-    
-    tmp = [local_min[x] for x in local_min2]
-    plt.plot(tmp, avr_abs_acorr["total"][tmp], "o", color="red")
-    plt.plot(data[analyze_ch])
-    # plt.plot(local_min, avr_abs_acorr["total"][local_min], marker="o")
-    plt.show()
+    if debug_draw:
+        plt.figure(figsize=(15,5))
+        plt.plot(abs_acorr)
+        plt.plot(avr_abs_acorr)    
+        tmp = [local_min[x] for x in local_min2]
+        plt.plot(tmp, avr_abs_acorr["total"][tmp], "o", color="red")
+        plt.plot(data[analyze_ch])
+        plt.show()
+        
+    return local_min2
     
     
 
