@@ -192,10 +192,21 @@ if __name__ == "__main__":
     peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
     
 
+
 # %%
+
 def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
-    
-    
+    """Metoda pozwalająca narysować wykres wraz z zaznaczonymi maximami.
+
+    Args:
+        data (pd.DataFrame): dane wejściowe, w przypadku naszego projektu jest to cały dataset
+        column (str): Badana kolumna. Jest stringiem, bowiem u nas tak są oznaczone kanały
+        title (str): Tytuł na wykresie
+        x_label (str): Etykieta osi X
+        y_label (str): Etykieta osi Y
+        plot_width (int): Szerokość wykresu
+        plot_height (int): Wysokość wykresu
+    """
     peaks = findMaximums(data, column)
     plt.figure(figsize=(plot_width,plot_height))
     plt.plot(data[column])
