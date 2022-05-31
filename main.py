@@ -8,6 +8,8 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
+from peakdetect import peakdetect
+import plotly.graph_objects as go
 import multiprocessing
 
 # %%
@@ -312,7 +314,26 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
         
     return local_min2
     
-    
+def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
+    """Metoda pozwalająca narysować wykres wraz z zaznaczonymi maximami.
+
+    Args:
+        data (pd.DataFrame): dane wejściowe, w przypadku naszego projektu jest to cały dataset
+        column (str): Badana kolumna. Jest stringiem, bowiem u nas tak są oznaczone kanały
+        title (str): Tytuł na wykresie
+        x_label (str): Etykieta osi X
+        y_label (str): Etykieta osi Y
+        plot_width (int): Szerokość wykresu
+        plot_height (int): Wysokość wykresu
+    """
+    peaks = findMaximums(data, column)
+    plt.figure(figsize=(plot_width,plot_height))
+    plt.plot(data[column])
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+    plt.plot(data[column][peaks], "x") 
+    plt.show()
 
 # %%    
 def main(args = None):
@@ -333,5 +354,13 @@ def main(args = None):
         
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
+
+    calculated_correlation = correlation(data)
+    
+    # correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
+
+    peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
+
+# %%
 if __name__ == "__main__":
   main()
