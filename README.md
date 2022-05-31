@@ -10,14 +10,16 @@ Combustion analysis in a coal-fired power plant
 5. Create Python Virtual Environment by running `python -m venv venv`
 6. Run `source ./venv/bin/activate`
 7. Run `pip install -r requirements.txt`
-8. Everything should be ready, run program by clicking **RUN ALL** button in your editor
-9. In a popup choose Python interpreter version, should be something like `./venv Virtual Env`
+8.  Open file `main.py`
+9. Everything should be ready, run program by clicking **RUN ALL** button in your editor
+10. In a popup choose Python interpreter version, should be something like `./venv Virtual Env`
 
 ### Usage
 1. Open VSCode in project directory or run `code .`
 2. Run `git fetch`
 3. Run `git pull`
 4. Run `source ./venv/bin/activate`
-5. Check if Jupyter is in virtual environment
+5. Open file `main.py`
+6. Check if Jupyter is in virtual environment
    image.png
-6. Click **RUN ALL** in VSCode 
+7. Click **RUN ALL** in VSCode 
