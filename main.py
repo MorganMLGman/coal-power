@@ -8,6 +8,7 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
+import multiprocessing
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -35,7 +36,7 @@ def findMaximums(data: pd.DataFrame, column: str, width: int = 10, distance: int
     return ret  
 
 # %%
-def dataSplit(data: pd.DataFrame, spliter: list, channel: str = "all") -> (pd.DataFrame, list):
+def dataSplit(data: pd.DataFrame, spliter: list, channel: str = "all"):
     """Funkcja służąca do podziału danych na podzbiory, według podanej listy podziału. Przykładowo dla punktów podziału 1, 2, 3, zwraca przedziały [1, 2], [2, 3]
 
     Args:
@@ -45,6 +46,7 @@ def dataSplit(data: pd.DataFrame, spliter: list, channel: str = "all") -> (pd.Da
 
     Returns:
         pd.DataFrame: Zwraca dataFrame z przedziałami
+        list: list of keys to access buckets
     """
     logging.debug("Function: dataSplit")
     ret = pd.DataFrame()
@@ -313,7 +315,6 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
     
 
 # %%    
-
 def main(args = None):
     """Use logging insted of print for cleaner output
     """
@@ -326,10 +327,11 @@ def main(args = None):
     # --------------------------
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-    findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
+    minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
+    splited_df, buckets = dataSplit(data, minimums)
+    print(buckets)
         
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
   main()
-# %%
