@@ -9,6 +9,8 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks
 import statsmodels.api as sm
 import seaborn as sns
+from peakdetect import peakdetect
+import plotly.graph_objects as go
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -175,7 +177,6 @@ def correlationHeatmap(calculated_correlation: pd.DataFrame, title: str, font_si
     map.set_title(title, fontsize=font_size)
 
 
-
 # %%
 if __name__ == "__main__":
     
@@ -186,5 +187,33 @@ if __name__ == "__main__":
 
     calculated_correlation = correlation(data)
     
-    correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
+    # correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
+
+    peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
     
+
+
+# %%
+
+def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
+    """Metoda pozwalająca narysować wykres wraz z zaznaczonymi maximami.
+
+    Args:
+        data (pd.DataFrame): dane wejściowe, w przypadku naszego projektu jest to cały dataset
+        column (str): Badana kolumna. Jest stringiem, bowiem u nas tak są oznaczone kanały
+        title (str): Tytuł na wykresie
+        x_label (str): Etykieta osi X
+        y_label (str): Etykieta osi Y
+        plot_width (int): Szerokość wykresu
+        plot_height (int): Wysokość wykresu
+    """
+    peaks = findMaximums(data, column)
+    plt.figure(figsize=(plot_width,plot_height))
+    plt.plot(data[column])
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+    plt.plot(data[column][peaks], "x") 
+    plt.show()
+
+# %%
