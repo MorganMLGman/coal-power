@@ -8,7 +8,8 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
-import multiprocessing
+import multiprocessing as mp
+import threading as th
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -312,7 +313,47 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
         
     return local_min2
     
+# %%
+def __calculatePeriods(data: pd.Series, index: int, ret: list) -> None:
+    logging.debug(f"Function: __calculatePeriods")
     
+    if not isinstance(data, pd.Series):
+        logging.warning(f"Invalid data type, allowed type is: pd.Series, provided: {type(data)}")
+        exit()
+    
+    size = data.size
+    time = round(size/SPS, 4)    
+    ret[index] = (size, time)
+         
+# %%
+    
+def calculatePeriods(data: pd.Series, buckets: list, draw_debug: bool = False) -> dict:
+    logging.debug(f"Function: calculatePeriods")
+    
+    if not isinstance(data, pd.Series):
+        logging.warning(f"Invalid data type, allowed type is: pd.Series, provided: {type(data)}")
+        return None
+    
+    if not isinstance(buckets, list):
+        logging.warning(f"Invalid data type, allowed type is: list, provided: {type(buckets)}")
+        return None
+    
+    ret = [None] * len(buckets)
+    threads = [None] * len(buckets)
+    
+    print(ret)
+    for i, bucket in enumerate(buckets):      
+        thr = th.Thread(target=__calculatePeriods, args=(data[bucket], i, ret))
+        threads[i] = thr
+        thr.start()
+        
+    for thread in threads:
+        thread.join()
+        
+    print(ret)
+        
+    
+
 
 # %%    
 def main(args = None):
@@ -328,10 +369,14 @@ def main(args = None):
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
     minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
+    print(minimums)
     splited_df, buckets = dataSplit(data, minimums)
     print(buckets)
+        
+    calculatePeriods(splited_df["ch5"], buckets)
         
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
   main()
+# %%
