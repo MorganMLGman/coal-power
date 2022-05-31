@@ -302,16 +302,18 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
     local_min2 =  argrelextrema(avr_abs_acorr["total"][local_min].values, np.less, order=order2)[0]
     logging.debug(f"Local min2: {local_min2}")
     
+    tmp = [local_min[x] for x in local_min2]
+    logging.debug(f"Tmp: {tmp}")
+    
     if debug_draw:
         plt.figure(figsize=(15,5))
         plt.plot(abs_acorr)
         plt.plot(avr_abs_acorr)    
-        tmp = [local_min[x] for x in local_min2]
         plt.plot(tmp, avr_abs_acorr["total"][tmp], "o", color="red")
         plt.plot(data[analyze_ch])
         plt.show()
         
-    return local_min2
+    return tmp
     
 # %%
 def __calculatePeriods(data: pd.Series, index: int, ret: list) -> None:
@@ -338,20 +340,25 @@ def calculatePeriods(data: pd.Series, buckets: list, draw_debug: bool = False) -
         logging.warning(f"Invalid data type, allowed type is: list, provided: {type(buckets)}")
         return None
     
-    ret = [None] * len(buckets)
+    tmp = [None] * len(buckets)
     threads = [None] * len(buckets)
-    
-    print(ret)
     for i, bucket in enumerate(buckets):      
-        thr = th.Thread(target=__calculatePeriods, args=(data[bucket], i, ret))
+        thr = th.Thread(target=__calculatePeriods, args=(data[bucket], i, tmp))
         threads[i] = thr
         thr.start()
         
     for thread in threads:
         thread.join()
         
-    print(ret)
-        
+    logging.debug(f"Tmp: {tmp}")
+    
+    ret = dict().fromkeys(buckets)
+    
+    for i, bucket in enumerate(buckets):
+        ret[bucket] = tmp[i]
+    
+    logging.debug(f"Ret: {ret!r}")
+    return ret
     
 
 
@@ -369,9 +376,7 @@ def main(args = None):
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
     minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
-    print(minimums)
     splited_df, buckets = dataSplit(data, minimums)
-    print(buckets)
         
     calculatePeriods(splited_df["ch5"], buckets)
         
