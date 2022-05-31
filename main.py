@@ -326,7 +326,7 @@ def main(args = None):
     # --------------------------
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-    findMinimumsByAutoCorr(data, "ch5")
+    findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
         
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
