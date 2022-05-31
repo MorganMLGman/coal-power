@@ -1,13 +1,11 @@
 # %%
 import logging
 from time import perf_counter
-import matplotlib
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
-from pyparsing import col
 from scipy.io import loadmat
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
 
@@ -260,6 +258,38 @@ def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", overl
     plt.show()
 
 # %%
+def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: int = SPS) -> list:
+    logging.debug(f"Function: findMinimumsByAutoCorr")
+    
+    if not isinstance(data, pd.DataFrame):
+        logging.error(f"Bad input parameter: data")
+        return None
+    
+    if not analyze_ch in data.columns:
+        logging.error(f"Bad input parameter: analyze_ch")
+        return None
+    
+    acorr = autocorrelation(data[analyze_ch])
+    abs_acorr = acorr.abs()
+    avr_abs_acorr = abs_acorr.rolling(window=5*window).mean() 
+    local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=100)[0]
+    print(local_min)
+    
+    local_min2 =  argrelextrema(avr_abs_acorr["total"][local_min].values, np.less, order=10)[0]
+    
+    plt.figure(figsize=(15,5))
+    plt.plot(abs_acorr)
+    plt.plot(avr_abs_acorr)
+    
+    tmp = [local_min[x] for x in local_min2]
+    plt.plot(tmp, avr_abs_acorr["total"][tmp], "o", color="red")
+    plt.plot(data[analyze_ch])
+    # plt.plot(local_min, avr_abs_acorr["total"][local_min], marker="o")
+    plt.show()
+    
+    
+
+# %%    
 
 def main(args = None):
     """Use logging insted of print for cleaner output
@@ -273,13 +303,8 @@ def main(args = None):
     # --------------------------
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-    
-    maximums_a08r_ch5 = findMaximums(data, "ch5", prominence=0.4) 
-    splited_df, keys = dataSplit(data, maximums_a08r_ch5, "all")
-    
-    dane = autocorrelation(splited_df["ch1"]["bucket1"])    
-    drawAutocorrelation(dane, overlaid=True, lineWidth=0.5)
-    
+    findMinimumsByAutoCorr(data, "ch5")
+        
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
