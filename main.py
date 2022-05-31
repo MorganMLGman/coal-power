@@ -1,15 +1,14 @@
 # %%
 import logging
 from time import perf_counter
-import matplotlib
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
-from pyparsing import col
 from scipy.io import loadmat
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
+import multiprocessing
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -37,7 +36,7 @@ def findMaximums(data: pd.DataFrame, column: str, width: int = 10, distance: int
     return ret  
 
 # %%
-def dataSplit(data: pd.DataFrame, spliter: list, channel: str = "all") -> (pd.DataFrame, list):
+def dataSplit(data: pd.DataFrame, spliter: list, channel: str = "all"):
     """Funkcja służąca do podziału danych na podzbiory, według podanej listy podziału. Przykładowo dla punktów podziału 1, 2, 3, zwraca przedziały [1, 2], [2, 3]
 
     Args:
@@ -47,6 +46,7 @@ def dataSplit(data: pd.DataFrame, spliter: list, channel: str = "all") -> (pd.Da
 
     Returns:
         pd.DataFrame: Zwraca dataFrame z przedziałami
+        list: list of keys to access buckets
     """
     logging.debug("Function: dataSplit")
     ret = pd.DataFrame()
@@ -208,6 +208,14 @@ def autocorrelation(data) -> pd.DataFrame:
 
 # %%
 def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", overlaid = False, lineWidth: float = 1.0) -> None:
+    """drawAutocorrelation fuction draw plot of auto correlation of provided data
+
+    Args:
+        data (pd.DataFrame): data to plot
+        name (str, optional): title for plot. Defaults to "Autocorrelation".
+        overlaid (bool, optional): draw multiple plots on one image. Defaults to False.
+        lineWidth (float, optional): witdh of plot lines. Defaults to 1.0.
+    """
     logging.debug(f"Function: drawAutocorrelation")
     logging.debug(data.columns)
     
@@ -260,7 +268,53 @@ def drawAutocorrelation(data: pd.DataFrame, name: str = "Autocorrelation", overl
     plt.show()
 
 # %%
+def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: int = SPS, order: int = 200, order2: int = 11, debug_draw: bool = False) -> list:
+    """findMinimumsByAutoCorr find minimums in data based on autocorrelation
 
+    Args:
+        data (pd.DataFrame): data to analyze
+        analyze_ch (str, optional): column from data to anazlyze. Defaults to "ch1".
+        window (int, optional): rolling window mean size. Defaults to SPS.
+        order (int, optional): samples to analyze, stage 1. Defaults to 200.
+        order2 (int, optional): samples to analyze, stage 2. Defaults to 11.
+        debug_draw (bool, optional): draw debug plot with minimums. Defaults to False.
+
+    Returns:
+        list: list of found minimums
+    """    
+    logging.debug(f"Function: findMinimumsByAutoCorr")
+    
+    if not isinstance(data, pd.DataFrame):
+        logging.error(f"Bad input parameter: data")
+        return None
+    
+    if not analyze_ch in data.columns:
+        logging.error(f"Bad input parameter: analyze_ch")
+        return None
+    
+    acorr = autocorrelation(data[analyze_ch])
+    abs_acorr = acorr.abs()
+    avr_abs_acorr = abs_acorr.rolling(window=window).mean() 
+    local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=order)[0]
+    logging.debug(f"Local min: {local_min}")
+    
+    local_min2 =  argrelextrema(avr_abs_acorr["total"][local_min].values, np.less, order=order2)[0]
+    logging.debug(f"Local min2: {local_min2}")
+    
+    if debug_draw:
+        plt.figure(figsize=(15,5))
+        plt.plot(abs_acorr)
+        plt.plot(avr_abs_acorr)    
+        tmp = [local_min[x] for x in local_min2]
+        plt.plot(tmp, avr_abs_acorr["total"][tmp], "o", color="red")
+        plt.plot(data[analyze_ch])
+        plt.show()
+        
+    return local_min2
+    
+    
+
+# %%    
 def main(args = None):
     """Use logging insted of print for cleaner output
     """
@@ -273,15 +327,11 @@ def main(args = None):
     # --------------------------
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-    
-    maximums_a08r_ch5 = findMaximums(data, "ch5", prominence=0.4) 
-    splited_df, keys = dataSplit(data, maximums_a08r_ch5, "all")
-    
-    dane = autocorrelation(splited_df["ch1"]["bucket1"])    
-    drawAutocorrelation(dane, overlaid=True, lineWidth=0.5)
-    
+    minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
+    splited_df, buckets = dataSplit(data, minimums)
+    print(buckets)
+        
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
   main()
-# %%
