@@ -414,5 +414,5 @@ def main(args = None):
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
-  main()
+    main()
 # %%
