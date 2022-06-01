@@ -376,6 +376,7 @@ def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label
         plot_width (int): Szerokość wykresu
         plot_height (int): Wysokość wykresu
     """
+    logging.debug(f"Function: peaksPlot")
     plt.figure(figsize=(plot_width,plot_height))
     plt.plot(data[column])
     plt.xlabel(x_label)
