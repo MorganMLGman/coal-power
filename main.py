@@ -333,6 +333,15 @@ def __calculatePeriods(data: pd.Series, index: int, ret: list) -> None:
 # %%
     
 def calculatePeriods(data: pd.Series, buckets: list) -> dict:
+    """calculatePeriods Funkcja wylicza okresy przediałów
+
+    Args:
+        data (pd.Series): Jedna kolumna danych
+        buckets (list): Lista z przedziałami
+
+    Returns:
+        dict: Słownik z wyliczonymi wartościami
+    """    
     logging.debug(f"Function: calculatePeriods")
     
     if not isinstance(data, pd.Series):
