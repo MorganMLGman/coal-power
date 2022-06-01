@@ -1,4 +1,5 @@
 # %%
+from ast import arg
 import logging
 from time import perf_counter
 import pandas as pd
@@ -11,8 +12,6 @@ import seaborn as sns
 import multiprocessing as mp
 import threading as th
 from tabulate import tabulate as tb
-from peakdetect import peakdetect
-import plotly.graph_objects as go
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -300,10 +299,10 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
     abs_acorr = acorr.abs()
     avr_abs_acorr = abs_acorr.rolling(window=window).mean() 
     local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=order)[0]
-    logging.debug(f"Local min: {local_min}")
+    logging.debug(f"Local min: {local_min!r}")
     
     local_min2 =  argrelextrema(avr_abs_acorr["total"][local_min].values, np.less, order=order2)[0]
-    logging.debug(f"Local min2: {local_min2}")
+    logging.debug(f"Local min2: {local_min2!r}")
     
     tmp = [local_min[x] for x in local_min2]
     logging.debug(f"Tmp: {tmp}")
@@ -321,10 +320,6 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
 # %%
 def __calculatePeriods(data: pd.Series, index: int, ret: list) -> None:
     logging.debug(f"Function: __calculatePeriods")
-    
-    if not isinstance(data, pd.Series):
-        logging.warning(f"Invalid data type, allowed type is: pd.Series, provided: {type(data)}")
-        exit()
     
     size = data.size
     time = round(size/SPS, 4)    
@@ -394,6 +389,46 @@ def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label
     plt.plot(data[column][peaks], "x") 
     plt.show()
 
+# %%
+def __reduceResolution(data, column: str, index: int, ret: list, drop_by: int = SPS):
+    logging.debug(f"Function: __reduceResolution")
+    
+    ret[index] = pd.Series(data[column][::drop_by])
+# %%
+def reduceResolution(data, drop_by: int = SPS):
+    
+    logging.debug(f"Function: reduceResolution")
+    
+    if not ( isinstance(data, pd.DataFrame) or isinstance(data, pd.Series) ):
+        logging.warning(f"Invalid data type, allowed type is: pd.DataFrame or pd.Series, provided: {type(data)}")
+        return None
+    
+    if not isinstance(drop_by, int):
+        logging.warning(f"Invalid data type, allowed type is: INT, provided: {type(drop_by)}")
+        return None
+        
+    if isinstance(data, pd.Series):
+        ret = pd.Series(data[::drop_by])
+        logging.debug(f"Ret: {ret!r}")
+        logging.debug(f"Index: {ret.keys()!r}")
+        return ret
+    
+    else:        
+        threads = [None] * data.columns.size
+        th_data = [None] * data.columns.size
+        
+        for i, column in enumerate(data.columns):
+            thr = th.Thread(target=__reduceResolution, args=(data, column, i, th_data, drop_by))
+            threads[i] = thr
+            thr.start()
+            
+        for thr in threads:
+            thr.join()
+        
+        ret = pd.DataFrame(th_data)
+        
+        logging.debug(f"Ret: {ret!r}")
+
 # %%    
 def main(args = None):
     """Use logging insted of print for cleaner output
@@ -419,6 +454,8 @@ def main(args = None):
     maximums = findMaximums(data, "ch5")
     
     peaksPlot(data, maximums, "ch5", "Minima", "Sampel", "Wartość", 15, 5)
+    
+    reduceResolution(data, SPS)
     
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
