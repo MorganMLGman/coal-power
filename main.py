@@ -360,13 +360,15 @@ def calculatePeriods(data: pd.Series, buckets: list) -> dict:
         
     logging.debug(f"""Calculated periods:\n{tb(ret.values(), headers=["diff_samples", "diff_time_s"], tablefmt="fancy_grid", showindex="always")}""")
     return ret
-    
 
-def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
+# %%
+
+def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
     """Metoda pozwalająca narysować wykres wraz z zaznaczonymi maximami.
 
     Args:
         data (pd.DataFrame): dane wejściowe, w przypadku naszego projektu jest to cały dataset
+        peaks (list): lista punktów
         column (str): Badana kolumna. Jest stringiem, bowiem u nas tak są oznaczone kanały
         title (str): Tytuł na wykresie
         x_label (str): Etykieta osi X
@@ -374,7 +376,6 @@ def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_labe
         plot_width (int): Szerokość wykresu
         plot_height (int): Wysokość wykresu
     """
-    peaks = findMaximums(data, column)
     plt.figure(figsize=(plot_width,plot_height))
     plt.plot(data[column])
     plt.xlabel(x_label)
@@ -405,11 +406,12 @@ def main(args = None):
     
     correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
 
-    peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
+    maximums = findMaximums(data, "ch5")
+    
+    peaksPlot(data, maximums, "ch5", "Minima", "Sampel", "Wartość", 15, 5)
     
     logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
-# %%
 if __name__ == "__main__":
   main()
 # %%
