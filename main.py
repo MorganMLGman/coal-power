@@ -10,6 +10,7 @@ import statsmodels.api as sm
 import seaborn as sns
 import multiprocessing as mp
 import threading as th
+from tabulate import tabulate as tb
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -329,7 +330,7 @@ def __calculatePeriods(data: pd.Series, index: int, ret: list) -> None:
          
 # %%
     
-def calculatePeriods(data: pd.Series, buckets: list, draw_debug: bool = False) -> dict:
+def calculatePeriods(data: pd.Series, buckets: list) -> dict:
     logging.debug(f"Function: calculatePeriods")
     
     if not isinstance(data, pd.Series):
@@ -349,15 +350,13 @@ def calculatePeriods(data: pd.Series, buckets: list, draw_debug: bool = False) -
         
     for thread in threads:
         thread.join()
-        
-    logging.debug(f"Tmp: {tmp}")
-    
+       
     ret = dict().fromkeys(buckets)
     
     for i, bucket in enumerate(buckets):
         ret[bucket] = tmp[i]
-    
-    logging.debug(f"Ret: {ret!r}")
+        
+    logging.debug(f"""Calculated periods:\n{tb(ret.values(), headers=["diff_samples", "diff_time_s"], tablefmt="fancy_grid", showindex="always")}""")
     return ret
     
 
