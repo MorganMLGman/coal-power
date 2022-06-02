@@ -430,17 +430,15 @@ def main(args = None):
     calculated_correlation = correlation(data)
     
     correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
-
-    peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
+    
     diff = derivative(data, "ch5")
-    print(diff)
+    logger.debug(diff)
     maximums = findMaximums(data, "ch5")
     
-    peaksPlot(data, maximums, "ch5", "Minima", "Sampel", "Wartość", 15, 5)
+    peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
   main()
-
 # %%
