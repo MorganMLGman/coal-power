@@ -11,8 +11,6 @@ import seaborn as sns
 import multiprocessing as mp
 import threading as th
 from tabulate import tabulate as tb
-from peakdetect import peakdetect
-import plotly.graph_objects as go
 
 # %%
 DATA_FILE = "a08r.mat"
