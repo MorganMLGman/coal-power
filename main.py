@@ -422,7 +422,7 @@ def reduceResolution(data, drop_by: int = SPS):
         return None
         
     if isinstance(data, pd.Series):
-        ret = pd.Series(data[::drop_by])
+        ret = pd.Series(data[::drop_by], index=range(data.size))
         logger.debug(f"Ret: {ret!r}")
         logger.debug(f"Index: {ret.keys()!r}")
         return ret
@@ -441,7 +441,8 @@ def reduceResolution(data, drop_by: int = SPS):
         
         tmp = pd.DataFrame(th_data)
         ret = tmp.transpose()
-        ret.columns = data.columns               
+        ret.columns = data.columns
+        ret.index = range(ret[column].size)               
         logger.debug(f"Ret: {ret!r}")
         
         return ret
@@ -516,8 +517,24 @@ def sampleWindow(data, window: int = SPS):
         
         return ret
             
+# %%
+def drawPlotXD(*args, over_laid: bool = True, width: int = 15, height: int = 5, xlabel: str = "", ylabel: str = "") -> None:
+    logger.debug(f"Function: drawPlotXD")
+    
+    if over_laid:
+        plt.figure(figsize=(width, height))
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
         
-            
+        for item in args:
+            if isinstance(item, dict):
+                pass
+            else:
+                plt.plot(item)
+                
+        plt.legend()
+        plt.show()
+              
 
 # %%    
 def main(args = None):
@@ -546,6 +563,8 @@ def main(args = None):
     
     data_reduced = reduceResolution(data, SPS)
     samples_1s = sampleWindow(data)
+    
+    drawPlotXD(data_reduced, samples_1s)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
