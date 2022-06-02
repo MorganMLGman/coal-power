@@ -8,7 +8,6 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
-import multiprocessing as mp
 import threading as th
 from tabulate import tabulate as tb
 
@@ -443,8 +442,8 @@ def reduceResolution(data, drop_by: int = SPS):
         logger.debug(f"Ret: {ret!r}")
         
         return ret
-        
     
+# %% 
 def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
     """Jest to funkcja, która liczy pochodną dla danego zbioru danych. Zwraca DataFrame. Funkcja jest potrzebna do dalszej analizy.
 
@@ -457,6 +456,13 @@ def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
     """
     difference = data[column].diff()
     return difference
+
+# %%
+def __sampleWindow(data, column: str, index: int, ret: list, window: int = SPS):
+    pass
+# %%
+def sampleWindow(data, window: int = SPS):
+    pass
 
 # %%    
 def main(args = None):
