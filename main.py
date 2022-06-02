@@ -439,7 +439,9 @@ def reduceResolution(data, drop_by: int = SPS):
         for thr in threads:
             thr.join()
         
-        ret = pd.DataFrame(th_data)        
+        tmp = pd.DataFrame(th_data)
+        ret = tmp.transpose()
+        ret.columns = data.columns               
         logger.debug(f"Ret: {ret!r}")
         
         return ret
@@ -466,6 +468,15 @@ def __sampleWindow(data, column: str, index: int, ret: list, window: int = SPS):
     
 # %%
 def sampleWindow(data, window: int = SPS):
+    """sampleWindow, funkcja próbkuje dane co wartość podaną w window i liczy wartość średnią z utworzonych próbek
+
+    Args:
+        data (_type_): dane do przetworzenia
+        window (int, optional): rozmiar okna do próbkowania. Defaults to SPS.
+
+    Returns:
+        pd.DataFrame lub pd.Series: DataFrame lub Seria zależnie od ilości kolumn w danych wejściowych
+    """
     logger.debug(f"Function: sampleWindow")
     
     if not ( isinstance(data, pd.DataFrame) or isinstance(data, pd.Series) ):
@@ -502,6 +513,8 @@ def sampleWindow(data, window: int = SPS):
         ret = tmp.transpose()
         ret.columns = data.columns
         logger.debug(f"{ret!r}")
+        
+        return ret
             
         
             
