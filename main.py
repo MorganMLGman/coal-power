@@ -340,22 +340,22 @@ def main(args = None):
     """Use logging insted of print for cleaner output
     """
     # --------------------------
-    start_time = perf_counter()
-    logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
-    logger = logging.getLogger("projekt")
-    logger.setLevel(logging.DEBUG)    
-    logging.debug("Program beginning")
+    # start_time = perf_counter()
+    # logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+    # logger = logging.getLogger("projekt")
+    # logger.setLevel(logging.WARNING)    
+    # logging.debug("Program beginning")
     # --------------------------
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-    minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
-    splited_df, buckets = dataSplit(data, minimums)
-    print(buckets)
+    # minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
+    #splited_df, buckets = dataSplit(data, minimums)
+    #print(buckets)
         
-    logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
+    # logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 
-    calculated_correlation = correlation(data)
+    # calculated_correlation = correlation(data)
     
     # correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
 
@@ -364,3 +364,13 @@ def main(args = None):
 # %%
 if __name__ == "__main__":
   main()
+
+# %%
+data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
+print(data)
+diff = data["ch3"].diff()
+print("Tera pochodna\n")
+print(diff)
+
+
+# %%
