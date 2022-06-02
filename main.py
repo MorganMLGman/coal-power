@@ -372,7 +372,6 @@ def calculatePeriods(data: pd.Series, buckets: list) -> dict:
     return ret
 
 # %%
-
 def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
     """Metoda pozwalająca narysować wykres wraz z zaznaczonymi maximami.
 
@@ -434,13 +433,25 @@ def reduceResolution(data, drop_by: int = SPS):
         ret = pd.DataFrame(th_data)
         
         logger.debug(f"Ret: {ret!r}")
+def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
+    """Jest to funkcja, która liczy pochodną dla danego zbioru danych. Zwraca DataFrame. Funkcja jest potrzebna do dalszej analizy.
+
+    Args:
+        data (pd.DataFrame): Dataframe z danymi wejściowymi. Można też wprowadzić wybrany przedział
+        column (str): Kolumna, którą bierzemy do obliczeń
+
+    Returns:
+        pd.DataFrame: DataFrame z obliczoną pochodną
+    """
+    difference = data[column].diff()
+    return difference
 
 # %%    
 def main(args = None):
     """Use logging insted of print for cleaner output
     """
     # --------------------------
-    start_time = perf_counter()
+    start_time = perf_counter()   
     logger.debug("Program beginning")
     # --------------------------
     
@@ -453,15 +464,17 @@ def main(args = None):
     calculated_correlation = correlation(data)
     
     correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
-
+    
+    diff = derivative(data, "ch5")
+    logger.debug(diff)
     maximums = findMaximums(data, "ch5")
     
-    peaksPlot(data, maximums, "ch5", "Minima", "Sampel", "Wartość", 15, 5)
+    peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
     
     reduceResolution(data, SPS)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
-    main()
+  main()
 # %%
