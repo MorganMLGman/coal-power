@@ -17,10 +17,11 @@ DATA_FILE = "a08r.mat"
 ARRAY_NAME = "a08r"
 SPS = 8192 # Samples per second
 
-# %% RUN ONLY ONCE, ERRORS WHEN RUN MULTIPLE TIMES
+# %%
 
 logger = logging.getLogger("projekt")
 logger_stream = logging.StreamHandler()
+logger.handlers.clear()
 logger.addHandler(logger_stream)
 logger.setLevel(logging.DEBUG)
 
@@ -401,7 +402,15 @@ def __reduceResolution(data, column: str, index: int, ret: list, drop_by: int = 
     ret[index] = pd.Series(data[column][::drop_by])
 # %%
 def reduceResolution(data, drop_by: int = SPS):
-    
+    """reduceResolution drop resolution by drop_by parameter
+
+    Args:
+        data (pd.DataFrame or pd.Series): Data to reduce
+        drop_by (int, optional): Reduce resolution by drop_by, like 300 / 5 = 60. Defaults to SPS.
+
+    Returns:
+        pd.DataFrame or pd.Series: Reduced data
+    """
     logger.debug(f"Function: reduceResolution")
     
     if not ( isinstance(data, pd.DataFrame) or isinstance(data, pd.Series) ):
@@ -430,9 +439,12 @@ def reduceResolution(data, drop_by: int = SPS):
         for thr in threads:
             thr.join()
         
-        ret = pd.DataFrame(th_data)
-        
+        ret = pd.DataFrame(th_data)        
         logger.debug(f"Ret: {ret!r}")
+        
+        return ret
+        
+    
 def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
     """Jest to funkcja, która liczy pochodną dla danego zbioru danych. Zwraca DataFrame. Funkcja jest potrzebna do dalszej analizy.
 
@@ -471,7 +483,7 @@ def main(args = None):
     
     peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
     
-    reduceResolution(data, SPS)
+    data_reduced = reduceResolution(data, SPS)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
