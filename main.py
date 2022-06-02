@@ -360,17 +360,24 @@ def main(args = None):
     # correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
 
     peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
+    diff = derivative(data, "ch5")
+    print(diff)
 
 # %%
 if __name__ == "__main__":
   main()
 
 # %%
-data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-print(data)
-diff = data["ch3"].diff()
-print("Tera pochodna\n")
-print(diff)
+def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
+    """Jest to funkcja, która liczy pochodną dla danego zbioru danych. Zwraca DataFrame. Funkcja jest potrzebna do dalszej analizy.
 
+    Args:
+        data (pd.DataFrame): Dataframe z danymi wejściowymi. Można też wprowadzić wybrany przedział
+        column (str): Kolumna, którą bierzemy do obliczeń
 
+    Returns:
+        pd.DataFrame: DataFrame z obliczoną pochodną
+    """
+    difference = data[column].diff()
+    return difference
 # %%
