@@ -8,8 +8,8 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
-import multiprocessing as mp
 import threading as th
+import multiprocessing as mp
 from tabulate import tabulate as tb
 
 # %%
@@ -439,12 +439,14 @@ def reduceResolution(data, drop_by: int = SPS):
         for thr in threads:
             thr.join()
         
-        ret = pd.DataFrame(th_data)        
+        tmp = pd.DataFrame(th_data)
+        ret = tmp.transpose()
+        ret.columns = data.columns               
         logger.debug(f"Ret: {ret!r}")
         
         return ret
-        
     
+# %% 
 def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
     """Jest to funkcja, która liczy pochodną dla danego zbioru danych. Zwraca DataFrame. Funkcja jest potrzebna do dalszej analizy.
 
@@ -455,8 +457,67 @@ def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame z obliczoną pochodną
     """
+    logger.debug(f"Function: derivative")
     difference = data[column].diff()
     return difference
+
+# %%
+def __sampleWindow(data, column: str, index: int, ret: list, window: int = SPS):
+    logger.debug(f"Function: __sampleWindow, thread: {index}")
+    ret[index] = [data[column][i*window: (i+1)*window - 1].mean() for i in range(int(data[column].size / window))]
+    
+# %%
+def sampleWindow(data, window: int = SPS):
+    """sampleWindow, funkcja próbkuje dane co wartość podaną w window i liczy wartość średnią z utworzonych próbek
+
+    Args:
+        data (_type_): dane do przetworzenia
+        window (int, optional): rozmiar okna do próbkowania. Defaults to SPS.
+
+    Returns:
+        pd.DataFrame lub pd.Series: DataFrame lub Seria zależnie od ilości kolumn w danych wejściowych
+    """
+    logger.debug(f"Function: sampleWindow")
+    
+    if not ( isinstance(data, pd.DataFrame) or isinstance(data, pd.Series) ):
+        logger.warning(f"Invalid data type, allowed type is: pd.DataFrame or pd.Series, provided: {type(data)}")
+        return None
+    
+    if not isinstance(window, int) and window > 1:
+        logger.warning(f"Invalid data type, allowed type is: int, provided: {type(window)}")
+        return None
+    
+    if isinstance(data, pd.Series):
+        tmp = []
+        for i in range(int(data.size / window)):
+            tmp.append(data[i*window: (i+1)*window - 1].mean())
+        logger.debug(i)
+        ret = pd.Series(tmp)
+        logger.debug(ret)
+        
+        return ret
+
+    else:
+        threads = [None] * data.columns.size
+        th_data = [None] * data.columns.size
+        
+        for i, column in enumerate(data.columns):
+            thr = th.Thread(target=__sampleWindow, args=(data, column, i, th_data, window))
+            threads[i] = thr
+            thr.start()
+            
+        for thr in threads:
+            thr.join()
+            
+        tmp = pd.DataFrame(th_data)    
+        ret = tmp.transpose()
+        ret.columns = data.columns
+        logger.debug(f"{ret!r}")
+        
+        return ret
+            
+        
+            
 
 # %%    
 def main(args = None):
@@ -484,6 +545,7 @@ def main(args = None):
     peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
     
     data_reduced = reduceResolution(data, SPS)
+    samples_1s = sampleWindow(data)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
