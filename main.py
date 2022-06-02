@@ -1,4 +1,6 @@
 # %%
+from concurrent.futures import thread
+import enum
 import logging
 from time import perf_counter
 import pandas as pd
@@ -9,6 +11,7 @@ from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
 import threading as th
+import multiprocessing as mp
 from tabulate import tabulate as tb
 
 # %%
@@ -454,15 +457,41 @@ def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame z obliczoną pochodną
     """
+    logger.debug(f"Function: derivative")
     difference = data[column].diff()
     return difference
 
 # %%
 def __sampleWindow(data, column: str, index: int, ret: list, window: int = SPS):
-    pass
+    logger.debug(f"Function: __sampleWindow")
 # %%
 def sampleWindow(data, window: int = SPS):
-    pass
+    logger.debug(f"Function: sampleWindow")
+    
+    if not ( isinstance(data, pd.DataFrame) or isinstance(data, pd.Series) ):
+        logger.warning(f"Invalid data type, allowed type is: pd.DataFrame or pd.Series, provided: {type(data)}")
+        return None
+    
+    if not isinstance(window, int) and window > 1:
+        logger.warning(f"Invalid data type, allowed type is: int, provided: {type(window)}")
+        return None
+    
+    if isinstance(data, pd.Series):
+        tmp = []
+        for i in range(int(data.size / window)):
+            tmp.append(data[i*window: (i+1)*window - 1].mean())
+        logger.debug(i)
+        ret = pd.Series(tmp)
+        logger.debug(ret)
+        
+        return ret
+
+    else:
+        threads = [None] * data.columns.size
+        th_data = [None] * data.columns.size
+        
+        for i, column in enumerate(data.columns)
+            
 
 # %%    
 def main(args = None):
@@ -490,6 +519,7 @@ def main(args = None):
     peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
     
     data_reduced = reduceResolution(data, SPS)
+    samples_1s = sampleWindow(data['ch5'])
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
