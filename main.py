@@ -8,9 +8,11 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
+import multiprocessing as mp
+import threading as th
+from tabulate import tabulate as tb
 from peakdetect import peakdetect
 import plotly.graph_objects as go
-import multiprocessing
 
 # %%
 DATA_FILE = "a08r.mat"
@@ -303,22 +305,78 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
     local_min2 =  argrelextrema(avr_abs_acorr["total"][local_min].values, np.less, order=order2)[0]
     logging.debug(f"Local min2: {local_min2}")
     
+    tmp = [local_min[x] for x in local_min2]
+    logging.debug(f"Tmp: {tmp}")
+    
     if debug_draw:
         plt.figure(figsize=(15,5))
         plt.plot(abs_acorr)
         plt.plot(avr_abs_acorr)    
-        tmp = [local_min[x] for x in local_min2]
         plt.plot(tmp, avr_abs_acorr["total"][tmp], "o", color="red")
         plt.plot(data[analyze_ch])
         plt.show()
         
-    return local_min2
+    return tmp
     
-def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
+# %%
+def __calculatePeriods(data: pd.Series, index: int, ret: list) -> None:
+    logging.debug(f"Function: __calculatePeriods")
+    
+    if not isinstance(data, pd.Series):
+        logging.warning(f"Invalid data type, allowed type is: pd.Series, provided: {type(data)}")
+        exit()
+    
+    size = data.size
+    time = round(size/SPS, 4)    
+    ret[index] = (size, time)
+         
+# %%
+    
+def calculatePeriods(data: pd.Series, buckets: list) -> dict:
+    """calculatePeriods Funkcja wylicza okresy przediałów
+
+    Args:
+        data (pd.Series): Jedna kolumna danych
+        buckets (list): Lista z przedziałami
+
+    Returns:
+        dict: Słownik z wyliczonymi wartościami
+    """    
+    logging.debug(f"Function: calculatePeriods")
+    
+    if not isinstance(data, pd.Series):
+        logging.warning(f"Invalid data type, allowed type is: pd.Series, provided: {type(data)}")
+        return None
+    
+    if not isinstance(buckets, list):
+        logging.warning(f"Invalid data type, allowed type is: list, provided: {type(buckets)}")
+        return None
+    
+    tmp = [None] * len(buckets)
+    threads = [None] * len(buckets)
+    for i, bucket in enumerate(buckets):      
+        thr = th.Thread(target=__calculatePeriods, args=(data[bucket], i, tmp))
+        threads[i] = thr
+        thr.start()
+        
+    for thread in threads:
+        thread.join()
+       
+    ret = dict().fromkeys(buckets)
+    
+    for i, bucket in enumerate(buckets):
+        ret[bucket] = tmp[i]
+        
+    logging.debug(f"""Calculated periods:\n{tb(ret.values(), headers=["diff_samples", "diff_time_s"], tablefmt="fancy_grid", showindex="always")}""")
+    return ret
+
+# %%
+def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
     """Metoda pozwalająca narysować wykres wraz z zaznaczonymi maximami.
 
     Args:
         data (pd.DataFrame): dane wejściowe, w przypadku naszego projektu jest to cały dataset
+        peaks (list): lista punktów
         column (str): Badana kolumna. Jest stringiem, bowiem u nas tak są oznaczone kanały
         title (str): Tytuł na wykresie
         x_label (str): Etykieta osi X
@@ -326,7 +384,7 @@ def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_labe
         plot_width (int): Szerokość wykresu
         plot_height (int): Wysokość wykresu
     """
-    peaks = findMaximums(data, column)
+    logging.debug(f"Function: peaksPlot")
     plt.figure(figsize=(plot_width,plot_height))
     plt.plot(data[column])
     plt.xlabel(x_label)
@@ -334,38 +392,6 @@ def peaksPlot(data: pd.DataFrame, column: str,  title: str, x_label: str, y_labe
     plt.title(title)
     plt.plot(data[column][peaks], "x") 
     plt.show()
-
-# %%    
-def main(args = None):
-    """Use logging insted of print for cleaner output
-    """
-    # --------------------------
-    # start_time = perf_counter()
-    # logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
-    # logger = logging.getLogger("projekt")
-    # logger.setLevel(logging.WARNING)    
-    # logging.debug("Program beginning")
-    # --------------------------
-    
-    data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-    # minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
-    #splited_df, buckets = dataSplit(data, minimums)
-    #print(buckets)
-        
-    # logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
-
-
-    # calculated_correlation = correlation(data)
-    
-    # correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
-
-    peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
-    diff = derivative(data, "ch5")
-    print(diff)
-
-# %%
-if __name__ == "__main__":
-  main()
 
 # %%
 def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
@@ -380,4 +406,36 @@ def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
     """
     difference = data[column].diff()
     return difference
+
+# %%    
+def main(args = None):
+    """Use logging insted of print for cleaner output
+    """
+    # --------------------------
+    start_time = perf_counter()   
+    logging.debug("Program beginning")
+    # --------------------------
+    
+    data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
+    minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
+    splited_df, buckets = dataSplit(data, minimums)
+        
+    calculatePeriods(splited_df["ch5"], buckets)
+        
+    calculated_correlation = correlation(data)
+    
+    correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
+
+    peaksPlot(data, "ch5", "Maxima", "Sampel", "Wartość", 19, 10)
+    diff = derivative(data, "ch5")
+    print(diff)
+    maximums = findMaximums(data, "ch5")
+    
+    peaksPlot(data, maximums, "ch5", "Minima", "Sampel", "Wartość", 15, 5)
+    
+    logging.info(f"Run time {round(perf_counter() - start_time, 4)}s")
+
+if __name__ == "__main__":
+  main()
+
 # %%
