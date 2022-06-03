@@ -519,6 +519,16 @@ def sampleWindow(data, window: int = SPS):
             
 # %%
 def drawPlotXD(*args, over_laid: bool = True, width: int = 15, height: int = 5, xlabel: str = "", ylabel: str = "", title: str = "") -> None:
+    """drawPlotXD https://morganmlgman.duckdns.org/s/nhQEwxFKs#
+
+    Args:
+        over_laid (bool, optional): _description_. Defaults to True.
+        width (int, optional): _description_. Defaults to 15.
+        height (int, optional): _description_. Defaults to 5.
+        xlabel (str, optional): _description_. Defaults to "".
+        ylabel (str, optional): _description_. Defaults to "".
+        title (str, optional): _description_. Defaults to "".
+    """
     logger.debug(f"Function: drawPlotXD")
     
     if over_laid:
