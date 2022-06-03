@@ -444,10 +444,10 @@ if __name__ == "__main__":
 # %%
 data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
 
-i = 0
 max = len(data["ch5"])
-print(max)
-print(data["ch5"][i])
+
+for i in range(max):
+    
 
 
 # %%
