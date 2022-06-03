@@ -445,9 +445,14 @@ if __name__ == "__main__":
 data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
 
 max = len(data["ch5"])
+howMany = 0
+tmp = []
+for i in range(1, max):
+    if data["ch5"][i-1] < 0 and data["ch5"][i+1] > 0:
+        howMany = howMany + 1
+        tmp.append(i)
 
-for i in range(max):
-    
+print(howMany)
 
 
 # %%
