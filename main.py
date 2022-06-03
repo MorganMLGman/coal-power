@@ -597,18 +597,11 @@ def main(args = None):
     data1 = {
         "data": data_reduced["ch5"],
         "label": "Rozdzielczość co 1s",
-        "color": "magenta",
+        "color": "darkorange",
         "marker": ".",
-        "draw_line": False
-    }
-    data2 = {
-        "data": samples_1s["ch5"],
-        "label": "Próbka z 1s",
-        "color": "turquise",
-        "line_width": 0.4,
         "draw_line": True
     }
-    drawPlotXD(data1, data2, xlabel="Sekunda", ylabel="Wartości", title="Dane bardzo super", over_laid=True)
+    drawPlotXD(data1, xlabel="Sekunda", ylabel="Wartości", title="Dane", over_laid=True)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
