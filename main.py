@@ -517,40 +517,6 @@ def sampleWindow(data, window: int = SPS):
         return ret
             
         
-            
-
-# %%    
-def main(args = None):
-    """Use logging insted of print for cleaner output
-    """
-    # --------------------------
-    start_time = perf_counter()   
-    logger.debug("Program beginning")
-    # --------------------------
-    
-    data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-    minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
-    splited_df, buckets = dataSplit(data, minimums)
-        
-    calculatePeriods(splited_df["ch5"], buckets)
-        
-    calculated_correlation = correlation(data)
-    
-    correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
-    
-    diff = derivative(data, "ch2")
-    logger.debug(diff)
-    maximums = findMaximums(data, "ch5")
-    
-    peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
-    
-    data_reduced = reduceResolution(data, SPS)
-    samples_1s = sampleWindow(data)
-    
-    logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
-
-if __name__ == "__main__":
-  main()
 # %%
 def diffCutting0Counter(data: pd.DataFrame, column: str):
     """Funkcja licząca liczbę przejść pochodnej przez 0. Uwaga, nie przybiera ona już obliczonej pochodnej, a wejśćiowy dataset
@@ -572,7 +538,38 @@ def diffCutting0Counter(data: pd.DataFrame, column: str):
             counter = counter + 1
             points.append(i)
 
-    return (counter, points)
-# %%
+    return (counter, points)   
 
+# %%    
+def main(args = None):
+    """Use logging insted of print for cleaner output
+    """
+    # --------------------------
+    start_time = perf_counter()   
+    logger.debug("Program beginning")
+    # --------------------------
+    
+    data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
+    minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
+    splited_df, buckets = dataSplit(data, minimums)
+        
+    calculatePeriods(splited_df["ch5"], buckets)
+        
+    calculated_correlation = correlation(data)
+    
+    correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
+    
+    diff = derivative(data, "ch5")
+    logger.debug(diff)
+    maximums = findMaximums(data, "ch5")
+    
+    peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
+    
+    data_reduced = reduceResolution(data, SPS)
+    samples_1s = sampleWindow(data)
+    
+    logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
+
+if __name__ == "__main__":
+  main()
 # %%
