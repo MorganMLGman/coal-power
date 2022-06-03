@@ -458,7 +458,7 @@ def diffCutting0Counter(data: pd.DataFrame, column: str):
     counter = 0
     points = []
     for i in range(1, max):
-        if forCounting[i-1] < 0 and forCounting[i+1] > 0:
+        if new_data[i-1] < 0 and new_data[i+1] > 0:
             counter = counter + 1
             points.append(i)
 
