@@ -538,7 +538,7 @@ def main(args = None):
     
     correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
     
-    diff = derivative(data, "ch5")
+    diff = derivative(data, "ch2")
     logger.debug(diff)
     maximums = findMaximums(data, "ch5")
     
