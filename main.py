@@ -372,13 +372,12 @@ def calculatePeriods(data: pd.Series, buckets: list) -> dict:
     return ret
 
 # %%
-def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
+def peaksPlot(data: pd.DataFrame, peaks: list,  title: str, x_label: str, y_label: str, plot_width: int, plot_height: int):
     """Metoda pozwalająca narysować wykres wraz z zaznaczonymi maximami.
 
     Args:
         data (pd.DataFrame): dane wejściowe, w przypadku naszego projektu jest to cały dataset
         peaks (list): lista punktów
-        column (str): Badana kolumna. Jest stringiem, bowiem u nas tak są oznaczone kanały
         title (str): Tytuł na wykresie
         x_label (str): Etykieta osi X
         y_label (str): Etykieta osi Y
@@ -387,11 +386,11 @@ def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label
     """
     logger.debug(f"Function: peaksPlot")
     plt.figure(figsize=(plot_width,plot_height))
-    plt.plot(data[column])
+    plt.plot(data)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)
-    plt.plot(data[column][peaks], "x") 
+    plt.plot(data[peaks], "x") 
     plt.show()
 
 # %%
@@ -615,7 +614,7 @@ def main(args = None):
     logger.debug(diff)
     maximums = findMaximums(data, "ch5")
     
-    peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
+    peaksPlot(data["ch5"], maximums, "Maksima", "Sampel", "Wartość", 15, 5)
     
     data_reduced = reduceResolution(data, SPS)
     samples_1s = sampleWindow(data)
@@ -632,4 +631,5 @@ def main(args = None):
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
-  main()
+    main()
+# %%
