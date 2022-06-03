@@ -8,7 +8,6 @@ from scipy.io import loadmat
 from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
-import multiprocessing as mp
 import threading as th
 from tabulate import tabulate as tb
 
@@ -17,10 +16,11 @@ DATA_FILE = "a08r.mat"
 ARRAY_NAME = "a08r"
 SPS = 8192 # Samples per second
 
-# %% RUN ONLY ONCE, ERRORS WHEN RUN MULTIPLE TIMES
+# %%
 
 logger = logging.getLogger("projekt")
 logger_stream = logging.StreamHandler()
+logger.handlers.clear()
 logger.addHandler(logger_stream)
 logger.setLevel(logging.DEBUG)
 
@@ -305,10 +305,10 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
     abs_acorr = acorr.abs()
     avr_abs_acorr = abs_acorr.rolling(window=window).mean() 
     local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=order)[0]
-    logger.debug(f"Local min: {local_min}")
+    logger.debug(f"Local min: {local_min!r}")
     
     local_min2 =  argrelextrema(avr_abs_acorr["total"][local_min].values, np.less, order=order2)[0]
-    logger.debug(f"Local min2: {local_min2}")
+    logger.debug(f"Local min2: {local_min2!r}")
     
     tmp = [local_min[x] for x in local_min2]
     logger.debug(f"Tmp: {tmp}")
@@ -326,10 +326,6 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
 # %%
 def __calculatePeriods(data: pd.Series, index: int, ret: list) -> None:
     logger.debug(f"Function: __calculatePeriods")
-    
-    if not isinstance(data, pd.Series):
-        logger.warning(f"Invalid data type, allowed type is: pd.Series, provided: {type(data)}")
-        exit()
     
     size = data.size
     time = round(size/SPS, 4)    
@@ -399,6 +395,58 @@ def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label
     plt.show()
 
 # %%
+def __reduceResolution(data, column: str, index: int, ret: list, drop_by: int = SPS):
+    logger.debug(f"Function: __reduceResolution")
+    
+    ret[index] = pd.Series(data[column][::drop_by])
+# %%
+def reduceResolution(data, drop_by: int = SPS):
+    """reduceResolution drop resolution by drop_by parameter
+
+    Args:
+        data (pd.DataFrame or pd.Series): Data to reduce
+        drop_by (int, optional): Reduce resolution by drop_by, like 300 / 5 = 60. Defaults to SPS.
+
+    Returns:
+        pd.DataFrame or pd.Series: Reduced data
+    """
+    logger.debug(f"Function: reduceResolution")
+    
+    if not ( isinstance(data, pd.DataFrame) or isinstance(data, pd.Series) ):
+        logger.warning(f"Invalid data type, allowed type is: pd.DataFrame or pd.Series, provided: {type(data)}")
+        return None
+    
+    if not isinstance(drop_by, int):
+        logger.warning(f"Invalid data type, allowed type is: INT, provided: {type(drop_by)}")
+        return None
+        
+    if isinstance(data, pd.Series):
+        ret = pd.Series(data[::drop_by], index=range(data.size))
+        logger.debug(f"Ret: {ret!r}")
+        logger.debug(f"Index: {ret.keys()!r}")
+        return ret
+    
+    else:        
+        threads = [None] * data.columns.size
+        th_data = [None] * data.columns.size
+        
+        for i, column in enumerate(data.columns):
+            thr = th.Thread(target=__reduceResolution, args=(data, column, i, th_data, drop_by))
+            threads[i] = thr
+            thr.start()
+            
+        for thr in threads:
+            thr.join()
+        
+        tmp = pd.DataFrame(th_data)
+        ret = tmp.transpose()
+        ret.columns = data.columns
+        ret.index = range(ret[column].size)               
+        logger.debug(f"Ret: {ret!r}")
+        
+        return ret
+    
+# %% 
 def derivative(input_data: pd.DataFrame) -> pd.DataFrame:
     """Jest to funkcja, która liczy pochodną dla danego zbioru danych. Zwraca DataFrame. Funkcja jest potrzebna do dalszej analizy.
 
@@ -411,6 +459,138 @@ def derivative(input_data: pd.DataFrame) -> pd.DataFrame:
     """
     difference = input_data.diff()
     return difference
+
+# %%
+def __sampleWindow(data, column: str, index: int, ret: list, window: int = SPS):
+    logger.debug(f"Function: __sampleWindow, thread: {index}")
+    ret[index] = [data[column][i*window: (i+1)*window - 1].mean() for i in range(int(data[column].size / window))]
+    
+# %%
+def sampleWindow(data, window: int = SPS):
+    """sampleWindow, funkcja próbkuje dane co wartość podaną w window i liczy wartość średnią z utworzonych próbek
+
+    Args:
+        data (_type_): dane do przetworzenia
+        window (int, optional): rozmiar okna do próbkowania. Defaults to SPS.
+
+    Returns:
+        pd.DataFrame lub pd.Series: DataFrame lub Seria zależnie od ilości kolumn w danych wejściowych
+    """
+    logger.debug(f"Function: sampleWindow")
+    
+    if not ( isinstance(data, pd.DataFrame) or isinstance(data, pd.Series) ):
+        logger.warning(f"Invalid data type, allowed type is: pd.DataFrame or pd.Series, provided: {type(data)}")
+        return None
+    
+    if not isinstance(window, int) and window > 1:
+        logger.warning(f"Invalid data type, allowed type is: int, provided: {type(window)}")
+        return None
+    
+    if isinstance(data, pd.Series):
+        tmp = []
+        for i in range(int(data.size / window)):
+            tmp.append(data[i*window: (i+1)*window - 1].mean())
+        logger.debug(i)
+        ret = pd.Series(tmp)
+        logger.debug(ret)
+        
+        return ret
+
+    else:
+        threads = [None] * data.columns.size
+        th_data = [None] * data.columns.size
+        
+        for i, column in enumerate(data.columns):
+            thr = th.Thread(target=__sampleWindow, args=(data, column, i, th_data, window))
+            threads[i] = thr
+            thr.start()
+            
+        for thr in threads:
+            thr.join()
+            
+        tmp = pd.DataFrame(th_data)    
+        ret = tmp.transpose()
+        ret.columns = data.columns
+        logger.debug(f"{ret!r}")
+        
+        return ret
+            
+# %%
+def drawPlotXD(*args, over_laid: bool = True, width: int = 15, height: int = 5, xlabel: str = "", ylabel: str = "", title: str = "") -> None:
+    """drawPlotXD https://morganmlgman.duckdns.org/s/nhQEwxFKs#
+
+    Args:
+        over_laid (bool, optional): _description_. Defaults to True.
+        width (int, optional): _description_. Defaults to 15.
+        height (int, optional): _description_. Defaults to 5.
+        xlabel (str, optional): _description_. Defaults to "".
+        ylabel (str, optional): _description_. Defaults to "".
+        title (str, optional): _description_. Defaults to "".
+    """
+    logger.debug(f"Function: drawPlotXD")
+    
+    if over_laid:
+        plt.figure(figsize=(width, height))
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
+        
+        for item in args:
+            if isinstance(item, dict):
+                logger.debug(f"{item!r}")
+                plt.plot(item["data"],
+                         "o" if "draw_line" in item and not item["draw_line"] else "",
+                         label=item["label"] if "label" in item else "",
+                         color=item["color"] if "color" in item else "",
+                         linewidth=item["line_width"] if "line_width" in item else 0.9,
+                         marker=item["marker"] if "marker" in item else "")
+            else:
+                plt.plot(item, linewidth=0.9)
+                
+        plt.legend(loc="upper right")
+        plt.show()
+    
+    else:
+        plt.figure(figsize=(width, len(args)*height))
+              
+        for i, item in enumerate(args, start=1):
+            plt.subplot(len(args), 1, i)
+            plt.xlabel(xlabel)
+            plt.ylabel(ylabel)
+            plt.title(title)
+            if isinstance(item, dict):
+                logger.debug(f"{item!r}")
+                plt.plot(item["data"],
+                         "o" if "draw_line" in item and not item["draw_line"] else "",
+                         label=item["label"] if "label" in item else "",
+                         color=item["color"] if "color" in item else "",
+                         linewidth=item["line_width"] if "line_width" in item else 0.9,
+                         marker=item["marker"] if "marker" in item else "")
+            else:
+                plt.plot(item, linewidth=0.9)
+                
+            plt.legend(loc="upper right")        
+        plt.show()        
+
+def cuttingZeroCount(input_data: pd.DataFrame):
+    """Funkcja licząca liczbę przejść pochodnej przez 0. Można tu wrzucić pochodną
+
+    Args:
+        data (pd.DataFrame): Dane dla których zostanie obliczona liczba przejść przez 0. 
+        Jeśli chcemy dać kolumnę, to trzeba ją wpisać, np. data["ch5"]
+    Returns:
+        counter (int): Liczba przejść przez zero
+        points (list): punkty, w których doszło do tego przejścia
+    """
+    max = len(input_data)
+    counter = 0
+    points = []
+    for i in range(1, (max-1)):
+        if (input_data[i-1] < 0 and input_data[i+1] > 0) or (input_data[i-1] > 0 and input_data[i+1] < 0):
+            counter = counter + 1
+            points.append(i)
+
+    return (counter, points)
 
 # %%    
 def main(args = None):
@@ -437,30 +617,19 @@ def main(args = None):
     
     peaksPlot(data, maximums, "ch5", "Maksima", "Sampel", "Wartość", 15, 5)
     
+    data_reduced = reduceResolution(data, SPS)
+    samples_1s = sampleWindow(data)
+    
+    data1 = {
+        "data": data_reduced["ch5"],
+        "label": "Rozdzielczość co 1s",
+        "color": "darkorange",
+        "marker": ".",
+        "draw_line": True
+    }
+    drawPlotXD(data1, xlabel="Sekunda", ylabel="Wartości", title="Dane", over_laid=True)
+    
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
   main()
-# %%
-def cuttingZeroCount(input_data: pd.DataFrame):
-    """Funkcja licząca liczbę przejść pochodnej przez 0. Można tu wrzucić pochodną
-
-    Args:
-        data (pd.DataFrame): Dane dla których zostanie obliczona liczba przejść przez 0. 
-        Jeśli chcemy dać kolumnę, to trzeba ją wpisać, np. data["ch5"]
-    Returns:
-        counter (int): Liczba przejść przez zero
-        points (list): punkty, w których doszło do tego przejścia
-    """
-    max = len(input_data)
-    counter = 0
-    points = []
-    for i in range(1, (max-1)):
-        if (input_data[i-1] < 0 and input_data[i+1] > 0) or (input_data[i-1] > 0 and input_data[i+1] < 0):
-            counter = counter + 1
-            points.append(i)
-
-    return (counter, points)
-# %%
-
-# %%
