@@ -442,3 +442,27 @@ def main(args = None):
 if __name__ == "__main__":
   main()
 # %%
+def diffCutting0Counter(data: pd.DataFrame, column: str):
+    """Funkcja licząca liczbę przejść pochodnej przez 0. Uwaga, nie przybiera ona już obliczonej pochodnej, a wejśćiowy dataset
+
+    Args:
+        data (pd.DataFrame): Dane dla których zostanie obliczona pochodna oraz obliczona liczba przejść przez 0
+        column (str): Kolumna w badanych datasecie
+
+    Returns:
+        counter (int): Liczba przejść przez zero
+        points (list): punkty, w których doszło do tego przejścia
+    """
+    new_data = derivative(data, column)
+    max = len(new_data)
+    counter = 0
+    points = []
+    for i in range(1, max):
+        if new_data[i-1] < 0 and new_data[i+1] > 0:
+            counter = counter + 1
+            points.append(i)
+
+    return (counter, points)
+# %%
+
+# %%
