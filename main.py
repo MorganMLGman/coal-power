@@ -9,7 +9,6 @@ from scipy.signal import find_peaks, argrelextrema
 import statsmodels.api as sm
 import seaborn as sns
 import threading as th
-import multiprocessing as mp
 from tabulate import tabulate as tb
 
 # %%
