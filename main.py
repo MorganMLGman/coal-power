@@ -399,17 +399,17 @@ def peaksPlot(data: pd.DataFrame, peaks: list, column: str,  title: str, x_label
     plt.show()
 
 # %%
-def derivative(data: pd.DataFrame, column: str) -> pd.DataFrame:
+def derivative(input_data: pd.DataFrame) -> pd.DataFrame:
     """Jest to funkcja, która liczy pochodną dla danego zbioru danych. Zwraca DataFrame. Funkcja jest potrzebna do dalszej analizy.
 
     Args:
-        data (pd.DataFrame): Dataframe z danymi wejściowymi. Można też wprowadzić wybrany przedział
-        column (str): Kolumna, którą bierzemy do obliczeń
+        input_data (pd.DataFrame): Dataframe z danymi wejściowymi. Można też wprowadzić wybrany przedział
+        
 
     Returns:
         pd.DataFrame: DataFrame z obliczoną pochodną
     """
-    difference = data[column].diff()
+    difference = input_data.diff()
     return difference
 
 # %%    
@@ -431,7 +431,7 @@ def main(args = None):
     
     correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
     
-    diff = derivative(data, "ch5")
+    diff = derivative(data["ch5"])
     logger.debug(diff)
     maximums = findMaximums(data, "ch5")
     
@@ -442,7 +442,7 @@ def main(args = None):
 if __name__ == "__main__":
   main()
 # %%
-def cuttingZeroCount(inputData: pd.DataFrame):
+def cuttingZeroCount(input_data: pd.DataFrame):
     """Funkcja licząca liczbę przejść pochodnej przez 0. Można tu wrzucić pochodną
 
     Args:
@@ -452,11 +452,11 @@ def cuttingZeroCount(inputData: pd.DataFrame):
         counter (int): Liczba przejść przez zero
         points (list): punkty, w których doszło do tego przejścia
     """
-    max = len(inputData)
+    max = len(input_data)
     counter = 0
     points = []
     for i in range(1, (max-1)):
-        if (inputData[i-1] < 0 and inputData[i+1] > 0) or (inputData[i-1] > 0 and inputData[i+1] < 0):
+        if (input_data[i-1] < 0 and input_data[i+1] > 0) or (input_data[i-1] > 0 and input_data[i+1] < 0):
             counter = counter + 1
             points.append(i)
 
