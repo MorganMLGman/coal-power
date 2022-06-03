@@ -422,7 +422,7 @@ def reduceResolution(data, drop_by: int = SPS):
         return None
         
     if isinstance(data, pd.Series):
-        ret = pd.Series(data[::drop_by])
+        ret = pd.Series(data[::drop_by], index=range(data.size))
         logger.debug(f"Ret: {ret!r}")
         logger.debug(f"Index: {ret.keys()!r}")
         return ret
@@ -441,7 +441,8 @@ def reduceResolution(data, drop_by: int = SPS):
         
         tmp = pd.DataFrame(th_data)
         ret = tmp.transpose()
-        ret.columns = data.columns               
+        ret.columns = data.columns
+        ret.index = range(ret[column].size)               
         logger.debug(f"Ret: {ret!r}")
         
         return ret
@@ -516,8 +517,54 @@ def sampleWindow(data, window: int = SPS):
         
         return ret
             
+# %%
+def drawPlotXD(*args, over_laid: bool = True, width: int = 15, height: int = 5, xlabel: str = "", ylabel: str = "", title: str = "") -> None:
+    logger.debug(f"Function: drawPlotXD")
+    
+    if over_laid:
+        plt.figure(figsize=(width, height))
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
         
-            
+        for item in args:
+            if isinstance(item, dict):
+                logger.debug(f"{item!r}")
+                plt.plot(item["data"],
+                         "o" if "draw_line" in item and not item["draw_line"] else "",
+                         label=item["label"] if "label" in item else "",
+                         color=item["color"] if "color" in item else "",
+                         linewidth=item["line_width"] if "line_width" in item else 0.9,
+                         marker=item["marker"] if "marker" in item else "")
+            else:
+                plt.plot(item, linewidth=0.9)
+                
+        plt.legend(loc="upper right")
+        plt.show()
+    
+    else:
+        plt.figure(figsize=(width, len(args)*height))
+              
+        for i, item in enumerate(args, start=1):
+            plt.subplot(len(args), 1, i)
+            plt.xlabel(xlabel)
+            plt.ylabel(ylabel)
+            plt.title(title)
+            if isinstance(item, dict):
+                logger.debug(f"{item!r}")
+                plt.plot(item["data"],
+                         "o" if "draw_line" in item and not item["draw_line"] else "",
+                         label=item["label"] if "label" in item else "",
+                         color=item["color"] if "color" in item else "",
+                         linewidth=item["line_width"] if "line_width" in item else 0.9,
+                         marker=item["marker"] if "marker" in item else "")
+            else:
+                plt.plot(item, linewidth=0.9)
+                
+            plt.legend(loc="upper right")        
+        plt.show()
+        
+              
 
 # %%    
 def main(args = None):
@@ -547,8 +594,17 @@ def main(args = None):
     data_reduced = reduceResolution(data, SPS)
     samples_1s = sampleWindow(data)
     
+    data1 = {
+        "data": data_reduced["ch5"],
+        "label": "Rozdzielczość co 1s",
+        "color": "darkorange",
+        "marker": ".",
+        "draw_line": True
+    }
+    drawPlotXD(data1, xlabel="Sekunda", ylabel="Wartości", title="Dane", over_laid=True)
+    
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
-  main()
+    main()
 # %%
