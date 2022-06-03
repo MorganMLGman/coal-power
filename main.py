@@ -442,17 +442,17 @@ def main(args = None):
 if __name__ == "__main__":
   main()
 # %%
-data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-forCounting = derivative(data, "ch5")
-max = len(forCounting)
-howMany = 0
-tmp = []
-for i in range(1, max):
-    if forCounting[i-1] < 0 and forCounting[i+1] > 0:
-        howMany = howMany + 1
-        tmp.append(i)
+def diffCutting0Counter(data: pd.DataFrame, column: str):
+    new_data = derivative(data, column)
+    max = len(new_data)
+    counter = 0
+    points = []
+    for i in range(1, max):
+        if forCounting[i-1] < 0 and forCounting[i+1] > 0:
+            counter = counter + 1
+            points.append(i)
 
-print(howMany)
-
+    return (counter, points)
+# %%
 
 # %%
