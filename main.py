@@ -302,8 +302,8 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
         return None
     
     acorr = autocorrelation(data[analyze_ch])
-    abs_acorr = acorr.abs()
-    avr_abs_acorr = abs_acorr.rolling(window=window).mean() 
+    abs_acorr = acorr.pow(2).abs()
+    avr_abs_acorr = abs_acorr.rolling(window=window).mean()
     local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=order)[0]
     logger.debug(f"Local min: {local_min!r}")
     
@@ -622,7 +622,7 @@ def main(args = None):
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
          
-    findOffsetByAutoCorr(data, "ch4", "ch5", SPS, 300, 11, True, 2*SPS)
+    findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, SPS, 5, True, SPS/2)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
