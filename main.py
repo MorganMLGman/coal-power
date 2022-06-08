@@ -302,8 +302,8 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
         return None
     
     acorr = autocorrelation(data[analyze_ch])
-    abs_acorr = acorr.abs()
-    avr_abs_acorr = abs_acorr.rolling(window=window).mean() 
+    abs_acorr = acorr.pow(2).abs()
+    avr_abs_acorr = abs_acorr.rolling(window=window).mean()
     local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=order)[0]
     logger.debug(f"Local min: {local_min!r}")
     
@@ -591,49 +591,62 @@ def cuttingZeroCount(input_data: pd.DataFrame):
 
     return (counter, points)
 
-# %%    
-def main(args = None):
-    """Use logging insted of print for cleaner output
-    """
-    # --------------------------
-    start_time = perf_counter()   
-    logger.debug("Program beginning")
-    # --------------------------
-    
-    data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-    minimums = findMinimumsByAutoCorr(data, "ch5", order=500, debug_draw=True)
-    splited_df, buckets = dataSplit(data, minimums)
-        
-    calculatePeriods(splited_df["ch5"], buckets)
-        
-    calculated_correlation = correlation(data)
-    
-    correlationHeatmap(calculated_correlation, "Correlation Heatmap", 20)
-    
-    diff = derivative(data["ch5"])
-    logger.debug(diff)
-    maximums = findMaximums(data, "ch5")
-    
-    peaksPlot(data["ch5"], maximums, "Maksima", "Sampel", "Wartość", 15, 5)
-    
-    data_reduced = reduceResolution(data, SPS)
-    samples_1s = sampleWindow(data)
-    
-    data1 = {
-        "data": data_reduced["ch5"],
-        "label": "Rozdzielczość co 1s",
-        "color": "darkorange",
-        "marker": ".",
-        "draw_line": True
-    }
-    drawPlotXD(data1, xlabel="Sekunda", ylabel="Wartości", title="Dane", over_laid=True)
-    timeIntervals(data, "ch3", 200)
-    
-    logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
-
-if __name__ == "__main__":
-    main()
 # %%
+def findOffsetByAutoCorr(data: pd.DataFrame, ch1: str, ch2: str, window: int = SPS, order: int = 300, order2: int = 11, debug_draw: bool = False, align: int = SPS) -> float:
+    """findOffsetByAutoCorr funkcja sprawdza przesunięcia czasowe pomiędzy kanałami danych 
+
+    Args:
+        data (pd.DataFrame): dane do sprawdzenia
+        ch1 (str): kanał do porównania
+        ch2 (str): kanał do porównania
+        window (int, optional): okno do policzenia średniej. Defaults to SPS.
+        order (int, optional): przedział do szukania minimum. Defaults to 300.
+        order2 (int, optional): przedział2 do szukania minumum. Defaults to 11.
+        debug_draw (bool, optional): czy rysować wykres pomocniczy. Defaults to False.
+        align (int, optional): dopusczalne okno poszukiwań dopasowania. Defaults to SPS.
+
+    Raises:
+        TypeError: zły typ danych
+
+    Returns:
+        float: średnie przesunięcie danych w sekundach
+    """
+    logger.debug(f"Function: findOffsetByAutoCorr")
+    if not isinstance(data, pd.DataFrame):
+        logger.warning(f"Incorrect data, allowed only pd.DataFrame, data: {data!r}, data_type: {type(data)}")
+        raise TypeError(f"Incorrect data, allowed only pd.DataFrame, data_type: {type(data)}")
+    
+    data1_acorr_min = findMinimumsByAutoCorr(data, ch1, window, order, order2, debug_draw)
+    data2_acorr_min = findMinimumsByAutoCorr(data, ch2, window, order, order2, debug_draw)
+    
+    data2_aligned = [None] * len(data1_acorr_min)
+    
+    for i, val1 in enumerate(data1_acorr_min):
+        for j, val2 in enumerate(data2_acorr_min):
+            if val1 < (val2 + align) and val1 > (val2 - align):
+                data2_aligned[i] = val2
+                
+    logger.debug(data1_acorr_min)
+    logger.debug(data2_aligned)
+    
+    offset = []
+    
+    for i, item in enumerate(data2_aligned):
+        if item:
+            offset.append(data1_acorr_min[i] - item)
+            
+    logger.debug(offset)
+    
+    sum = 0
+    for item in offset:
+        sum += item
+        
+    mean = sum/len(offset)/SPS
+    
+    logger.debug(mean)
+    
+    return
+# %%       
 def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
     """Funkcja licząca czas trwania danej okresu. Przyjęto, że sekund ato 8192
 
@@ -666,6 +679,22 @@ def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
 
     return time_diff   
 
+# %%    
+def main(args = None):
+    """Use logging insted of print for cleaner output
+    """
+    # --------------------------
+    start_time = perf_counter()   
+    logger.debug("Program beginning")
+    # --------------------------
+    
+    data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
+    
+    findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, 200, 5, True, SPS/2)
+    
+    logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
+    
+if __name__ == "__main__":
+    main()
 # %%
 
-# %%
