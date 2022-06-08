@@ -634,6 +634,8 @@ if __name__ == "__main__":
     main()
 # %%
 SECOND = 8192
+data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
 
+findMinimumsByAutoCorr(data, "ch5", window=3*SPS, order=8000, order2=8, debug_draw=True)
 
 # %%
