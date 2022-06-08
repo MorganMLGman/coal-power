@@ -633,3 +633,7 @@ def main(args = None):
 if __name__ == "__main__":
     main()
 # %%
+SECOND = 8192
+
+
+# %%
