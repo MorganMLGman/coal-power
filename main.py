@@ -627,9 +627,45 @@ def main(args = None):
         "draw_line": True
     }
     drawPlotXD(data1, xlabel="Sekunda", ylabel="Wartości", title="Dane", over_laid=True)
+    timeIntervals(data, "ch3", 200)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
     main()
+# %%
+def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
+    """Funkcja licząca czas trwania danej okresu. Przyjęto, że sekund ato 8192
+
+    Args:
+        data (pd.DataFrame): Plik wejściowy z danymi
+        column (str): Kolumna w danych
+        ord (int, optional): Do porównania n próbek ze sobą i szukania minimum. Im więcej, to dłużej trwa. Defaults to SPS.
+
+    Returns:
+        list: Lista z czasem trwania każdego okresu
+    """
+    SECOND = SPS
+
+    tmp = []
+    tmp = findMinimumsByAutoCorr(data, column, window=3*SPS, order = ord, order2=10, debug_draw=True)
+
+    samples_number = len(tmp)
+
+    values = []
+
+    for i in range(1, samples_number):
+        diff = tmp[i] - tmp[i-1]
+        values.append(diff)
+
+    time_diff = []
+    for i in range(0,len(values)):
+        val = values[i]/SECOND
+       
+        time_diff.append("{:.5f}".format(val))
+
+    return time_diff   
+
+# %%
+
 # %%
