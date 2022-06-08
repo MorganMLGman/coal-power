@@ -610,6 +610,38 @@ def findOffsetByAutoCorr(data: pd.DataFrame, ch1: str, ch2: str, window: int = S
                 
     logger.debug(data1_acorr_min)
     logger.debug(data2_aligned)
+    
+def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
+    """Funkcja licząca czas trwania danej okresu. Przyjęto, że sekund ato 8192
+
+    Args:
+        data (pd.DataFrame): Plik wejściowy z danymi
+        column (str): Kolumna w danych
+        ord (int, optional): Do porównania n próbek ze sobą i szukania minimum. Im więcej, to dłużej trwa. Defaults to SPS.
+
+    Returns:
+        list: Lista z czasem trwania każdego okresu
+    """
+    SECOND = SPS
+
+    tmp = []
+    tmp = findMinimumsByAutoCorr(data, column, window=3*SPS, order = ord, order2=10, debug_draw=True)
+
+    samples_number = len(tmp)
+
+    values = []
+
+    for i in range(1, samples_number):
+        diff = tmp[i] - tmp[i-1]
+        values.append(diff)
+
+    time_diff = []
+    for i in range(0,len(values)):
+        val = values[i]/SECOND
+       
+        time_diff.append("{:.5f}".format(val))
+
+    return time_diff   
 
 # %%    
 def main(args = None):
@@ -621,7 +653,7 @@ def main(args = None):
     # --------------------------
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
-         
+    
     findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, SPS, 5, True, SPS/2)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
@@ -629,3 +661,4 @@ def main(args = None):
 if __name__ == "__main__":
     main()
 # %%
+
