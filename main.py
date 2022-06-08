@@ -635,6 +635,16 @@ if __name__ == "__main__":
     main()
 # %%
 def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
+    """Funkcja licząca czas trwania danej okresu. Przyjęto, że sekund ato 8192
+
+    Args:
+        data (pd.DataFrame): Plik wejściowy z danymi
+        column (str): Kolumna w danych
+        ord (int, optional): Do porównania n próbek ze sobą i szukania minimum. Im więcej, to dłużej trwa. Defaults to SPS.
+
+    Returns:
+        list: Lista z czasem trwania każdego okresu
+    """
     SECOND = SPS
 
     tmp = []
