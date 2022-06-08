@@ -627,19 +627,18 @@ def main(args = None):
         "draw_line": True
     }
     drawPlotXD(data1, xlabel="Sekunda", ylabel="Wartości", title="Dane", over_laid=True)
-    timeIntervals(data, "ch3")
+    timeIntervals(data, "ch3", 200)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
 
 if __name__ == "__main__":
     main()
 # %%
-
-def timeIntervals(data: pd.DataFrame, column: str) -> list:
+def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
     SECOND = SPS
 
     tmp = []
-    tmp = findMinimumsByAutoCorr(data, "ch5", window=3*SPS, order=200, order2=10, debug_draw=True)
+    tmp = findMinimumsByAutoCorr(data, column, window=3*SPS, order = ord, order2=10, debug_draw=True)
 
     samples_number = len(tmp)
 
@@ -656,5 +655,7 @@ def timeIntervals(data: pd.DataFrame, column: str) -> list:
         time_diff.append("{:.5f}".format(val))
 
     return time_diff   
+
+# %%
 
 # %%
