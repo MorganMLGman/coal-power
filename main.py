@@ -633,9 +633,29 @@ def main(args = None):
 if __name__ == "__main__":
     main()
 # %%
-SECOND = 8192
+SECOND = SPS
 data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
+tmp = []
+tmp = findMinimumsByAutoCorr(data, "ch5", window=3*SPS, order=200, order2=10, debug_draw=True)
 
-findMinimumsByAutoCorr(data, "ch5", window=3*SPS, order=8000, order2=8, debug_draw=True)
+samples_number = len(tmp)
+
+values = []
+
+for i in range(1, samples_number):
+    diff = tmp[i] - tmp[i-1]
+    values.append(diff)
+
+print(values)
+
+time_diff = []
+for i in range(0,len(values)):
+    val = values[i]/SECOND
+    time_diff.append(val)
+
+print(time_diff)    
+
+
+
 
 # %%
