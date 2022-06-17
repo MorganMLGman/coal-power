@@ -104,7 +104,9 @@ def drawDescriptiveStats(bucket: pd.Series, name: str, stats: dict, size_x: int,
     logger.debug("Function: drawDescriptiveStats")
     plt.figure(figsize=(size_x, size_y))
     plt.title(name)
-    plt.plot(bucket, label="Data")
+    plt.xlabel("Próbka")
+    plt.ylabel("Wartość")
+    plt.plot(bucket, label="Data", linewidth=0.7)
     plt.plot(stats["roll_mean"], label="1s mean")
     plt.hlines(stats["mean"], xmin=bucket.first_valid_index(), xmax=bucket.last_valid_index(), label="Mean", color="magenta")
     plt.hlines(stats["median"], xmin=bucket.first_valid_index(), xmax=bucket.last_valid_index(), label="Median", color="lime")
@@ -684,6 +686,14 @@ def main(args = None):
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
     
+    # INFO: Raw data
+    
+    drawPlotXD(data["ch1"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH1")
+    drawPlotXD(data["ch2"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH2")
+    drawPlotXD(data["ch3"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH3")
+    drawPlotXD(data["ch4"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH4")
+    drawPlotXD(data["ch5"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH5")
+    
     # INFO: Punkt 2 - statystyki opisowe
     ch1_stats = descriptiveStats(data["ch1"])
     ch2_stats = descriptiveStats(data["ch2"])
@@ -691,7 +701,7 @@ def main(args = None):
     ch4_stats = descriptiveStats(data["ch4"])
     ch5_stats = descriptiveStats(data["ch5"])
     
-    drawDescriptiveStats(data["ch1"], "Kanał CH1", ch1_stats, 15, 8)
+    drawDescriptiveStats(data["ch1"], "Kanał CH1", ch1_stats, 15, 5)
     print(f"""Kanał: CH1
           Średnia: {ch1_stats["mean"]}
           Mediana: {ch1_stats["median"]}
@@ -701,7 +711,7 @@ def main(args = None):
           Wariancja: {ch1_stats["var"]}
           """)
     
-    drawDescriptiveStats(data["ch2"], "Kanał CH2", ch2_stats, 15, 8)
+    drawDescriptiveStats(data["ch2"], "Kanał CH2", ch2_stats, 15, 5)
     print(f"""Kanał: CH2
           Średnia: {ch2_stats["mean"]}
           Mediana: {ch2_stats["median"]}
@@ -711,7 +721,7 @@ def main(args = None):
           Wariancja: {ch2_stats["var"]}
           """)
     
-    drawDescriptiveStats(data["ch3"], "Kanał CH3", ch3_stats, 15, 8)
+    drawDescriptiveStats(data["ch3"], "Kanał CH3", ch3_stats, 15, 5)
     print(f"""Kanał: CH3
           Średnia: {ch3_stats["mean"]}
           Mediana: {ch3_stats["median"]}
@@ -721,7 +731,7 @@ def main(args = None):
           Wariancja: {ch3_stats["var"]}
           """)
     
-    drawDescriptiveStats(data["ch4"], "Kanał CH4", ch4_stats, 15, 8)
+    drawDescriptiveStats(data["ch4"], "Kanał CH4", ch4_stats, 15, 5)
     print(f"""Kanał: CH4
           Średnia: {ch4_stats["mean"]}
           Mediana: {ch4_stats["median"]}
@@ -731,7 +741,7 @@ def main(args = None):
           Wariancja: {ch4_stats["var"]}
           """)
     
-    drawDescriptiveStats(data["ch5"], "Kanał CH5", ch5_stats, 15, 8)
+    drawDescriptiveStats(data["ch5"], "Kanał CH5", ch5_stats, 15, 5)
     print(f"""Kanał: CH5
           Średnia: {ch5_stats["mean"]}
           Mediana: {ch5_stats["median"]}
