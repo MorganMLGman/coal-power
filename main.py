@@ -302,7 +302,7 @@ def findMinimumsByAutoCorr(data: pd.DataFrame, analyze_ch: str = "ch1", window: 
         return None
     
     acorr = autocorrelation(data[analyze_ch])
-    abs_acorr = acorr.pow(2).abs()
+    abs_acorr = acorr.abs()
     avr_abs_acorr = abs_acorr.rolling(window=window).mean()
     local_min =  argrelextrema(avr_abs_acorr.values, np.less, order=order)[0]
     logger.debug(f"Local min: {local_min!r}")
@@ -690,7 +690,32 @@ def main(args = None):
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
     
-    findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, 200, 5, True, SPS/2)
+    # INFO: Punkt 2 - statystyki opisowe
+    ch1_stats = descriptiveStats(data["ch1"])
+    ch2_stats = descriptiveStats(data["ch2"])
+    ch3_stats = descriptiveStats(data["ch3"])
+    ch4_stats = descriptiveStats(data["ch4"])
+    ch5_stats = descriptiveStats(data["ch5"])
+    
+    drawDescriptiveStats(data["ch1"], "Kanał CH1", ch1_stats, 20, 15)
+    print(f"""Kanał: CH1
+          Średnia: {ch1_stats["mean"]}
+          Mediana: {ch1_stats["median"]}
+          Minimum: {ch1_stats["min"]}
+          Maksimum: {ch1_stats["max"]}
+          Odchylenie: {ch1_stats["std"]}
+          Wariancja: {ch1_stats["var"]}
+          """)
+    
+    drawDescriptiveStats(data["ch2"], "Kanał CH2", ch2_stats, 20, 15)
+    print(f"""Kanał: CH2
+          Średnia: {ch2_stats["mean"]}
+          Mediana: {ch2_stats["median"]}
+          Minimum: {ch2_stats["min"]}
+          Maksimum: {ch2_stats["max"]}
+          Odchylenie: {ch2_stats["std"]}
+          Wariancja: {ch2_stats["var"]}
+          """)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
