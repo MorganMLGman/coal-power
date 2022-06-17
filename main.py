@@ -107,12 +107,12 @@ def drawDescriptiveStats(bucket: pd.Series, name: str, stats: dict, size_x: int,
     plt.plot(bucket, label="Data")
     plt.plot(stats["roll_mean"], label="1s mean")
     plt.hlines(stats["mean"], xmin=bucket.first_valid_index(), xmax=bucket.last_valid_index(), label="Mean", color="magenta")
-    plt.hlines(stats["median"], xmin=bucket.first_valid_index(), xmax=bucket.last_valid_index(), label="Median", color="royalblue")
+    plt.hlines(stats["median"], xmin=bucket.first_valid_index(), xmax=bucket.last_valid_index(), label="Median", color="lime")
     plt.plot(stats["min_idx"], stats["min"], "o", color="aqua", label="Minimum")
     plt.plot(stats["max_idx"], stats["max"], "o", color="crimson", label="Maximum")
     plt.plot([], [], ' ', label=f"""Standard deviation: {round(stats["std"], 2)}""")
     plt.plot([], [], ' ', label=f"""Variance: {round(stats["var"], 2)}""")
-    plt.legend()
+    plt.legend(loc="upper right") 
     plt.show()
 
 # %%
@@ -691,7 +691,7 @@ def main(args = None):
     ch4_stats = descriptiveStats(data["ch4"])
     ch5_stats = descriptiveStats(data["ch5"])
     
-    drawDescriptiveStats(data["ch1"], "Kanał CH1", ch1_stats, 20, 15)
+    drawDescriptiveStats(data["ch1"], "Kanał CH1", ch1_stats, 15, 8)
     print(f"""Kanał: CH1
           Średnia: {ch1_stats["mean"]}
           Mediana: {ch1_stats["median"]}
@@ -701,7 +701,7 @@ def main(args = None):
           Wariancja: {ch1_stats["var"]}
           """)
     
-    drawDescriptiveStats(data["ch2"], "Kanał CH2", ch2_stats, 20, 15)
+    drawDescriptiveStats(data["ch2"], "Kanał CH2", ch2_stats, 15, 8)
     print(f"""Kanał: CH2
           Średnia: {ch2_stats["mean"]}
           Mediana: {ch2_stats["median"]}
@@ -709,6 +709,36 @@ def main(args = None):
           Maksimum: {ch2_stats["max"]}
           Odchylenie: {ch2_stats["std"]}
           Wariancja: {ch2_stats["var"]}
+          """)
+    
+    drawDescriptiveStats(data["ch3"], "Kanał CH3", ch3_stats, 15, 8)
+    print(f"""Kanał: CH3
+          Średnia: {ch3_stats["mean"]}
+          Mediana: {ch3_stats["median"]}
+          Minimum: {ch3_stats["min"]}
+          Maksimum: {ch3_stats["max"]}
+          Odchylenie: {ch3_stats["std"]}
+          Wariancja: {ch3_stats["var"]}
+          """)
+    
+    drawDescriptiveStats(data["ch4"], "Kanał CH4", ch4_stats, 15, 8)
+    print(f"""Kanał: CH4
+          Średnia: {ch4_stats["mean"]}
+          Mediana: {ch4_stats["median"]}
+          Minimum: {ch4_stats["min"]}
+          Maksimum: {ch4_stats["max"]}
+          Odchylenie: {ch4_stats["std"]}
+          Wariancja: {ch4_stats["var"]}
+          """)
+    
+    drawDescriptiveStats(data["ch5"], "Kanał CH5", ch5_stats, 15, 8)
+    print(f"""Kanał: CH5
+          Średnia: {ch5_stats["mean"]}
+          Mediana: {ch5_stats["median"]}
+          Minimum: {ch5_stats["min"]}
+          Maksimum: {ch5_stats["max"]}
+          Odchylenie: {ch5_stats["std"]}
+          Wariancja: {ch5_stats["var"]}
           """)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
