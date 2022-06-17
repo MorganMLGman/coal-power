@@ -106,7 +106,6 @@ def drawDescriptiveStats(bucket: pd.Series, name: str, stats: dict, size_x: int,
     plt.title(name)
     plt.plot(bucket, label="Data")
     plt.plot(stats["roll_mean"], label="1s mean")
-    plt.plot(stats["auto_corr"], label="Auto Corr", color="greenyellow")
     plt.hlines(stats["mean"], xmin=bucket.first_valid_index(), xmax=bucket.last_valid_index(), label="Mean", color="magenta")
     plt.hlines(stats["median"], xmin=bucket.first_valid_index(), xmax=bucket.last_valid_index(), label="Median", color="royalblue")
     plt.plot(stats["min_idx"], stats["min"], "o", color="aqua", label="Minimum")
@@ -617,8 +616,7 @@ def findOffsetByAutoCorr(data: pd.DataFrame, ch1: str, ch2: str, window: int = S
         raise TypeError(f"Incorrect data, allowed only pd.DataFrame, data_type: {type(data)}")
     
     data1_acorr_min = findMinimumsByAutoCorr(data, ch1, window, order, order2, debug_draw)
-    data2_acorr_min = findMinimumsByAutoCorr(data, ch2, window, order, order2, debug_draw)
-    
+    data2_acorr_min = findMinimumsByAutoCorr(data, ch2, window, order, order2, debug_draw)    
     data2_aligned = [None] * len(data1_acorr_min)
     
     for i, val1 in enumerate(data1_acorr_min):
@@ -628,24 +626,20 @@ def findOffsetByAutoCorr(data: pd.DataFrame, ch1: str, ch2: str, window: int = S
                 
     logger.debug(data1_acorr_min)
     logger.debug(data2_aligned)
-    
-    offset = []
-    
+    offset = []        
     for i, item in enumerate(data2_aligned):
         if item:
             offset.append(data1_acorr_min[i] - item)
             
-    logger.debug(offset)
-    
+    logger.debug(offset)    
     sum = 0
     for item in offset:
-        sum += item
-        
+        sum += item        
     mean = sum/len(offset)/SPS
     
     logger.debug(mean)
     
-    return
+    return mean
 # %%       
 def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
     """Funkcja licząca czas trwania danej okresu. Przyjęto, że sekund ato 8192
