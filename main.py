@@ -12,8 +12,8 @@ import threading as th
 from tabulate import tabulate as tb
 
 # %%
-DATA_FILE = "a08r.mat"
-ARRAY_NAME = "a08r"
+DATA_FILE = "a07r.mat"
+ARRAY_NAME = "a07r"
 SPS = 8192 # Samples per second
 
 # %%
