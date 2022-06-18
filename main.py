@@ -690,7 +690,8 @@ def main(args = None):
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
     
-    findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, 200, 5, True, SPS/2)
+    print("Wykonuje się: findOffsetByAutoCorr: ")
+    findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, SPS, 10, True, SPS/2)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
