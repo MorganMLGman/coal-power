@@ -789,11 +789,25 @@ def main(args = None):
     
     # INFO: Punkt 4 - okresowość
     
+    drawAutocorrelation(autocorrelation(data), "Autokorelacja", False, 0.8)
+    
     min_ch1 = findMinimumsByAutoCorr(data, "ch1", 3*SPS, SPS, 10, True)
     min_ch2 = findMinimumsByAutoCorr(data, "ch2", 3*SPS, SPS, 10, True)
     min_ch3 = findMinimumsByAutoCorr(data, "ch3", 3*SPS, SPS, 10, True)
     min_ch4 = findMinimumsByAutoCorr(data, "ch4", 3*SPS, SPS, 10, True)
     min_ch5 = findMinimumsByAutoCorr(data, "ch5", 3*SPS, SPS, 10, True)
+    
+    ch1_split, ch1_keys = dataSplit(data, min_ch1, "ch1")
+    ch2_split, ch2_keys = dataSplit(data, min_ch2, "ch2")
+    ch3_split, ch3_keys = dataSplit(data, min_ch3, "ch3")
+    ch4_split, ch4_keys = dataSplit(data, min_ch4, "ch4")
+    ch5_split, ch5_keys = dataSplit(data, min_ch5, "ch5")
+    
+    print(calculatePeriods(ch1_split, ch1_keys))
+    print(calculatePeriods(ch2_split, ch2_keys))
+    print(calculatePeriods(ch3_split, ch3_keys))
+    print(calculatePeriods(ch4_split, ch4_keys))
+    print(calculatePeriods(ch5_split, ch5_keys))
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
