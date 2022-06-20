@@ -567,10 +567,12 @@ def drawPlotXD(*args, over_laid: bool = True, width: int = 15, height: int = 5, 
                          linewidth=item["line_width"] if "line_width" in item else 0.9,
                          marker=item["marker"] if "marker" in item else "")
             else:
-                plt.plot(item, linewidth=0.9)
+                plt.plot(item, linewidth=0.7)
                 
             plt.legend(loc="upper right")        
         plt.show()        
+
+# %%
 
 def cuttingZeroCount(input_data: pd.DataFrame):
     """Funkcja licząca liczbę przejść pochodnej przez 0. Można tu wrzucić pochodną
@@ -582,16 +584,37 @@ def cuttingZeroCount(input_data: pd.DataFrame):
         counter (int): Liczba przejść przez zero
         points (list): punkty, w których doszło do tego przejścia
     """
-    max = len(input_data)
+    max = input_data.last_valid_index()
     counter = 0
     points = []
-    for i in range(1, (max-1)):
+    for i in range(input_data.first_valid_index() + 1, (max-1)):
         if (input_data[i-1] < 0 and input_data[i+1] > 0) or (input_data[i-1] > 0 and input_data[i+1] < 0):
             counter = counter + 1
             points.append(i)
 
     return (counter, points)
 
+# %%
+def cuttingMeanCount(input_data: pd.DataFrame):
+    """Funkcja licząca liczbę przejść pochodnej przez 0. Można tu wrzucić pochodną
+
+    Args:
+        data (pd.DataFrame): Dane dla których zostanie obliczona liczba przejść przez 0. 
+        Jeśli chcemy dać kolumnę, to trzeba ją wpisać, np. data["ch5"]
+    Returns:
+        counter (int): Liczba przejść przez zero
+        points (list): punkty, w których doszło do tego przejścia
+    """
+    max = input_data.last_valid_index()
+    mean = input_data.mean()
+    counter = 0
+    points = []
+    for i in range(input_data.first_valid_index() + 1, (max-1)):
+        if (input_data[i-1] < mean and input_data[i+1] > mean) or (input_data[i-1] > mean and input_data[i+1] < mean):
+            counter = counter + 1
+            points.append(i)
+
+    return (counter, points)
 # %%
 def findOffsetByAutoCorr(data: pd.DataFrame, ch1: str, ch2: str, window: int = SPS, order: int = 300, order2: int = 11, debug_draw: bool = False, align: int = SPS) -> float:
     """findOffsetByAutoCorr funkcja sprawdza przesunięcia czasowe pomiędzy kanałami danych 
@@ -789,7 +812,7 @@ def main(args = None):
     
     # INFO: Punkt 4 - okresowość
     
-    drawAutocorrelation(autocorrelation(data), "Autokorelacja", True, 0.8)
+    # drawAutocorrelation(autocorrelation(data), "Autokorelacja", True, 0.8)
     
     # min_ch1 = findMinimumsByAutoCorr(data, "ch1", 3*SPS, SPS, 10, True)
     # min_ch2 = findMinimumsByAutoCorr(data, "ch2", 3*SPS, SPS, 10, True)
@@ -808,6 +831,30 @@ def main(args = None):
     # print(calculatePeriods(ch3_split, ch3_keys))
     # print(calculatePeriods(ch4_split, ch4_keys))
     # print(calculatePeriods(ch5_split, ch5_keys))
+    
+    # INFO: Punkt 5 
+    
+    ch1_sample_mean = []
+    ch1_sample_var = []
+    ch1_zero_cross = []
+    ch1_mean_cross = []
+    
+    for i in range(0, data["ch1"].size, SPS):
+        sample = data["ch1"][i: i+SPS]
+        ch1_sample_mean.append(sample.mean())
+        ch1_sample_var.append(sample.var())
+        
+        (val, point) = cuttingZeroCount(sample.diff())
+        ch1_zero_cross.append(val)
+        
+        (val2, point2) = cuttingMeanCount(sample)
+        ch1_mean_cross.append(val2)
+        
+    drawPlotXD(ch1_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH1")
+    drawPlotXD(ch1_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH1")
+    drawPlotXD(ch1_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejście przez 0 pochodnej z próbki CH1")
+    drawPlotXD(ch1_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejście przez średnią wartości z próbki CH1")
+    
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
