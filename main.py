@@ -763,19 +763,19 @@ def main(args = None):
     data_corr = correlation(data)
     correlationHeatmap(data_corr, "Korelacja", 16)
     
-    off_ch1_ch2 = findOffsetByAutoCorr(data, "ch1", "ch2", 3*SPS, SPS, 10, SPS )
-    off_ch1_ch3 = findOffsetByAutoCorr(data, "ch1", "ch3", 3*SPS, SPS, 10, SPS)
-    off_ch1_ch4 = findOffsetByAutoCorr(data, "ch1", "ch4", 3*SPS, SPS, 10, SPS )
-    off_ch1_ch5 = findOffsetByAutoCorr(data, "ch1", "ch5", 3*SPS, SPS, 10, SPS )
+    off_ch1_ch2 = findOffsetByAutoCorr(data, "ch1", "ch2", SPS, SPS // 3, 10, SPS)
+    off_ch1_ch3 = findOffsetByAutoCorr(data, "ch1", "ch3", SPS, SPS // 3, 10, SPS)
+    off_ch1_ch4 = findOffsetByAutoCorr(data, "ch1", "ch4", SPS, SPS // 3, 10, SPS)
+    off_ch1_ch5 = findOffsetByAutoCorr(data, "ch1", "ch5", SPS, SPS // 3, 10, SPS )
     
-    off_ch2_ch3 = findOffsetByAutoCorr(data, "ch2", "ch3", 3*SPS, SPS, 10, SPS )
-    off_ch2_ch4 = findOffsetByAutoCorr(data, "ch2", "ch4", 3*SPS, SPS, 10, SPS )
-    off_ch2_ch5 = findOffsetByAutoCorr(data, "ch2", "ch5", 3*SPS, SPS, 10, SPS )
+    off_ch2_ch3 = findOffsetByAutoCorr(data, "ch2", "ch3", SPS, SPS // 3, 10, SPS )
+    off_ch2_ch4 = findOffsetByAutoCorr(data, "ch2", "ch4", SPS, SPS // 3, 10, SPS )
+    off_ch2_ch5 = findOffsetByAutoCorr(data, "ch2", "ch5", SPS, SPS // 3, 10, SPS )
     
-    off_ch3_ch4 = findOffsetByAutoCorr(data, "ch3", "ch4", 3*SPS, SPS, 10, SPS )
-    off_ch3_ch5 = findOffsetByAutoCorr(data, "ch3", "ch5", 3*SPS, SPS, 10, SPS )
+    off_ch3_ch4 = findOffsetByAutoCorr(data, "ch3", "ch4", SPS, SPS // 3, 10, SPS )
+    off_ch3_ch5 = findOffsetByAutoCorr(data, "ch3", "ch5", SPS, SPS // 3, 10, SPS )
     
-    off_ch4_ch5 = findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, SPS, 10, SPS )
+    off_ch4_ch5 = findOffsetByAutoCorr(data, "ch4", "ch5", SPS, SPS // 3, 10, SPS )
     
     print(f"""
           Przesunięcie ch1 <-> ch2: {off_ch1_ch2} sekund
