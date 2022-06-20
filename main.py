@@ -754,38 +754,46 @@ def main(args = None):
     
     # INFO: Punkt 3 - korelacja 
     
-    data_corr = correlation(data)
-    correlationHeatmap(data_corr, "Korelacja", 16)
+    # data_corr = correlation(data)
+    # correlationHeatmap(data_corr, "Korelacja", 16)
     
-    off_ch1_ch2 = findOffsetByAutoCorr(data, "ch1", "ch2", 3*SPS, SPS, 10, SPS // 3)
-    off_ch1_ch3 = findOffsetByAutoCorr(data, "ch1", "ch3", 3*SPS, SPS, 10, SPS // 3)
-    off_ch1_ch4 = findOffsetByAutoCorr(data, "ch1", "ch4", 3*SPS, SPS, 10, SPS // 3)
-    off_ch1_ch5 = findOffsetByAutoCorr(data, "ch1", "ch5", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch1_ch2 = findOffsetByAutoCorr(data, "ch1", "ch2", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch1_ch3 = findOffsetByAutoCorr(data, "ch1", "ch3", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch1_ch4 = findOffsetByAutoCorr(data, "ch1", "ch4", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch1_ch5 = findOffsetByAutoCorr(data, "ch1", "ch5", 3*SPS, SPS, 10, SPS // 3)
     
-    off_ch2_ch3 = findOffsetByAutoCorr(data, "ch2", "ch3", 3*SPS, SPS, 10, SPS // 3)
-    off_ch2_ch4 = findOffsetByAutoCorr(data, "ch2", "ch4", 3*SPS, SPS, 10, SPS // 3)
-    off_ch2_ch5 = findOffsetByAutoCorr(data, "ch2", "ch5", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch2_ch3 = findOffsetByAutoCorr(data, "ch2", "ch3", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch2_ch4 = findOffsetByAutoCorr(data, "ch2", "ch4", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch2_ch5 = findOffsetByAutoCorr(data, "ch2", "ch5", 3*SPS, SPS, 10, SPS // 3)
     
-    off_ch3_ch4 = findOffsetByAutoCorr(data, "ch3", "ch4", 3*SPS, SPS, 10, SPS // 3)
-    off_ch3_ch5 = findOffsetByAutoCorr(data, "ch3", "ch5", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch3_ch4 = findOffsetByAutoCorr(data, "ch3", "ch4", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch3_ch5 = findOffsetByAutoCorr(data, "ch3", "ch5", 3*SPS, SPS, 10, SPS // 3)
     
-    off_ch4_ch5 = findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, SPS, 10, SPS // 3)
+    # off_ch4_ch5 = findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, SPS, 10, SPS // 3)
     
-    print(f"""
-          Przesunięcie ch1 <-> ch2: {off_ch1_ch2} sekund
-          przesunięcie ch2 <-> ch3: {off_ch1_ch3} sekund
-          przesunięcie ch3 <-> ch4: {off_ch1_ch4} sekund
-          przesunięcie ch4 <-> ch5: {off_ch1_ch5} sekund
+    # print(f"""
+    #       Przesunięcie ch1 <-> ch2: {off_ch1_ch2} sekund
+    #       przesunięcie ch1 <-> ch3: {off_ch1_ch3} sekund
+    #       przesunięcie ch1 <-> ch4: {off_ch1_ch4} sekund
+    #       przesunięcie ch1 <-> ch5: {off_ch1_ch5} sekund
           
-          przesunięcie ch2 <-> ch3: {off_ch2_ch3} sekund
-          przesunięcie ch2 <-> ch4: {off_ch2_ch4} sekund
-          przesunięcie ch2 <-> ch5: {off_ch2_ch5} sekund
+    #       przesunięcie ch2 <-> ch3: {off_ch2_ch3} sekund
+    #       przesunięcie ch2 <-> ch4: {off_ch2_ch4} sekund
+    #       przesunięcie ch2 <-> ch5: {off_ch2_ch5} sekund
           
-          przesunięcie ch3 <-> ch4: {off_ch3_ch4} sekund
-          przesunięcie ch3 <-> ch5: {off_ch3_ch5} sekund
+    #       przesunięcie ch3 <-> ch4: {off_ch3_ch4} sekund
+    #       przesunięcie ch3 <-> ch5: {off_ch3_ch5} sekund
           
-          przesunięcie ch4 <-> ch5: {off_ch4_ch5} sekund
-          """)
+    #       przesunięcie ch4 <-> ch5: {off_ch4_ch5} sekund
+    #       """)
+    
+    # INFO: Punkt 4 - okresowość
+    
+    min_ch1 = findMinimumsByAutoCorr(data, "ch1", 3*SPS, SPS, 10, True)
+    min_ch2 = findMinimumsByAutoCorr(data, "ch2", 3*SPS, SPS, 10, True)
+    min_ch3 = findMinimumsByAutoCorr(data, "ch3", 3*SPS, SPS, 10, True)
+    min_ch4 = findMinimumsByAutoCorr(data, "ch4", 3*SPS, SPS, 10, True)
+    min_ch5 = findMinimumsByAutoCorr(data, "ch5", 3*SPS, SPS, 10, True)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
