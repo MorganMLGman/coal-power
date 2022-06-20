@@ -680,6 +680,8 @@ def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
     return time_diff   
 
 # %%    
+
+# %%
 def main(args = None):
     """Use logging insted of print for cleaner output
     """
@@ -690,12 +692,74 @@ def main(args = None):
     
     data = pd.DataFrame(loadmat(DATA_FILE)[ARRAY_NAME], columns=(["ch1", "ch2", "ch3", "ch4", "ch5"]))
     
-    print("Wykonuje się: findOffsetByAutoCorr: ")
-    findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, SPS, 10, True, SPS/2)
+    # INFO: Raw data
+    
+    drawPlotXD(data["ch1"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH1")
+    drawPlotXD(data["ch2"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH2")
+    drawPlotXD(data["ch3"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH3")
+    drawPlotXD(data["ch4"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH4")
+    drawPlotXD(data["ch5"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH5")
+    
+    # INFO: Punkt 2 - statystyki opisowe
+    ch1_stats = descriptiveStats(data["ch1"])
+    ch2_stats = descriptiveStats(data["ch2"])
+    ch3_stats = descriptiveStats(data["ch3"])
+    ch4_stats = descriptiveStats(data["ch4"])
+    ch5_stats = descriptiveStats(data["ch5"])
+    
+    drawDescriptiveStats(data["ch1"], "Kanał CH1", ch1_stats, 15, 5)
+    print(f"""Kanał: CH1
+          Średnia: {ch1_stats["mean"]}
+          Mediana: {ch1_stats["median"]}
+          Minimum: {ch1_stats["min"]}
+          Maksimum: {ch1_stats["max"]}
+          Odchylenie: {ch1_stats["std"]}
+          Wariancja: {ch1_stats["var"]}
+          """)
+    
+    drawDescriptiveStats(data["ch2"], "Kanał CH2", ch2_stats, 15, 5)
+    print(f"""Kanał: CH2
+          Średnia: {ch2_stats["mean"]}
+          Mediana: {ch2_stats["median"]}
+          Minimum: {ch2_stats["min"]}
+          Maksimum: {ch2_stats["max"]}
+          Odchylenie: {ch2_stats["std"]}
+          Wariancja: {ch2_stats["var"]}
+          """)
+    
+    drawDescriptiveStats(data["ch3"], "Kanał CH3", ch3_stats, 15, 5)
+    print(f"""Kanał: CH3
+          Średnia: {ch3_stats["mean"]}
+          Mediana: {ch3_stats["median"]}
+          Minimum: {ch3_stats["min"]}
+          Maksimum: {ch3_stats["max"]}
+          Odchylenie: {ch3_stats["std"]}
+          Wariancja: {ch3_stats["var"]}
+          """)
+    
+    drawDescriptiveStats(data["ch4"], "Kanał CH4", ch4_stats, 15, 5)
+    print(f"""Kanał: CH4
+          Średnia: {ch4_stats["mean"]}
+          Mediana: {ch4_stats["median"]}
+          Minimum: {ch4_stats["min"]}
+          Maksimum: {ch4_stats["max"]}
+          Odchylenie: {ch4_stats["std"]}
+          Wariancja: {ch4_stats["var"]}
+          """)
+    
+    drawDescriptiveStats(data["ch5"], "Kanał CH5", ch5_stats, 15, 5)
+    print(f"""Kanał: CH5
+          Średnia: {ch5_stats["mean"]}
+          Mediana: {ch5_stats["median"]}
+          Minimum: {ch5_stats["min"]}
+          Maksimum: {ch5_stats["max"]}
+          Odchylenie: {ch5_stats["std"]}
+          Wariancja: {ch5_stats["var"]}
+          """)
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
 if __name__ == "__main__":
     main()
-# %%
 
+# %%
