@@ -694,68 +694,126 @@ def main(args = None):
     
     # INFO: Raw data
     
-    drawPlotXD(data["ch1"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH1")
-    drawPlotXD(data["ch2"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH2")
-    drawPlotXD(data["ch3"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH3")
-    drawPlotXD(data["ch4"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH4")
-    drawPlotXD(data["ch5"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH5")
+    # drawPlotXD(data["ch1"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH1")
+    # drawPlotXD(data["ch2"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH2")
+    # drawPlotXD(data["ch3"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH3")
+    # drawPlotXD(data["ch4"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH4")
+    # drawPlotXD(data["ch5"], xlabel="Próbka", ylabel="Wartość", title="Kanał CH5")
     
-    # INFO: Punkt 2 - statystyki opisowe
-    ch1_stats = descriptiveStats(data["ch1"])
-    ch2_stats = descriptiveStats(data["ch2"])
-    ch3_stats = descriptiveStats(data["ch3"])
-    ch4_stats = descriptiveStats(data["ch4"])
-    ch5_stats = descriptiveStats(data["ch5"])
+    # # INFO: Punkt 2 - statystyki opisowe
+    # ch1_stats = descriptiveStats(data["ch1"])
+    # ch2_stats = descriptiveStats(data["ch2"])
+    # ch3_stats = descriptiveStats(data["ch3"])
+    # ch4_stats = descriptiveStats(data["ch4"])
+    # ch5_stats = descriptiveStats(data["ch5"])
     
-    drawDescriptiveStats(data["ch1"], "Kanał CH1", ch1_stats, 15, 5)
-    print(f"""Kanał: CH1
-          Średnia: {ch1_stats["mean"]}
-          Mediana: {ch1_stats["median"]}
-          Minimum: {ch1_stats["min"]}
-          Maksimum: {ch1_stats["max"]}
-          Odchylenie: {ch1_stats["std"]}
-          Wariancja: {ch1_stats["var"]}
+    # drawDescriptiveStats(data["ch1"], "Kanał CH1", ch1_stats, 15, 5)
+    # print(f"""Kanał: CH1
+    #       Średnia: {ch1_stats["mean"]}
+    #       Mediana: {ch1_stats["median"]}
+    #       Minimum: {ch1_stats["min"]}
+    #       Maksimum: {ch1_stats["max"]}
+    #       Odchylenie: {ch1_stats["std"]}
+    #       Wariancja: {ch1_stats["var"]}
+    #       """)
+    
+    # drawDescriptiveStats(data["ch2"], "Kanał CH2", ch2_stats, 15, 5)
+    # print(f"""Kanał: CH2
+    #       Średnia: {ch2_stats["mean"]}
+    #       Mediana: {ch2_stats["median"]}
+    #       Minimum: {ch2_stats["min"]}
+    #       Maksimum: {ch2_stats["max"]}
+    #       Odchylenie: {ch2_stats["std"]}
+    #       Wariancja: {ch2_stats["var"]}
+    #       """)
+    
+    # drawDescriptiveStats(data["ch3"], "Kanał CH3", ch3_stats, 15, 5)
+    # print(f"""Kanał: CH3
+    #       Średnia: {ch3_stats["mean"]}
+    #       Mediana: {ch3_stats["median"]}
+    #       Minimum: {ch3_stats["min"]}
+    #       Maksimum: {ch3_stats["max"]}
+    #       Odchylenie: {ch3_stats["std"]}
+    #       Wariancja: {ch3_stats["var"]}
+    #       """)
+    
+    # drawDescriptiveStats(data["ch4"], "Kanał CH4", ch4_stats, 15, 5)
+    # print(f"""Kanał: CH4
+    #       Średnia: {ch4_stats["mean"]}
+    #       Mediana: {ch4_stats["median"]}
+    #       Minimum: {ch4_stats["min"]}
+    #       Maksimum: {ch4_stats["max"]}
+    #       Odchylenie: {ch4_stats["std"]}
+    #       Wariancja: {ch4_stats["var"]}
+    #       """)
+    
+    # drawDescriptiveStats(data["ch5"], "Kanał CH5", ch5_stats, 15, 5)
+    # print(f"""Kanał: CH5
+    #       Średnia: {ch5_stats["mean"]}
+    #       Mediana: {ch5_stats["median"]}
+    #       Minimum: {ch5_stats["min"]}
+    #       Maksimum: {ch5_stats["max"]}
+    #       Odchylenie: {ch5_stats["std"]}
+    #       Wariancja: {ch5_stats["var"]}
+    #       """)
+
+
+           # INFO: Punkt 3 - korelacja 
+    
+    data_corr = correlation(data)
+    correlationHeatmap(data_corr, "Korelacja", 16)
+    
+    off_ch1_ch2 = findOffsetByAutoCorr(data, "ch1", "ch2", 3*SPS, SPS, 10, SPS )
+    off_ch1_ch3 = findOffsetByAutoCorr(data, "ch1", "ch3", 3*SPS, SPS, 10, SPS)
+    off_ch1_ch4 = findOffsetByAutoCorr(data, "ch1", "ch4", 3*SPS, SPS, 10, SPS )
+    off_ch1_ch5 = findOffsetByAutoCorr(data, "ch1", "ch5", 3*SPS, SPS, 10, SPS )
+    
+    off_ch2_ch3 = findOffsetByAutoCorr(data, "ch2", "ch3", 3*SPS, SPS, 10, SPS )
+    off_ch2_ch4 = findOffsetByAutoCorr(data, "ch2", "ch4", 3*SPS, SPS, 10, SPS )
+    off_ch2_ch5 = findOffsetByAutoCorr(data, "ch2", "ch5", 3*SPS, SPS, 10, SPS )
+    
+    off_ch3_ch4 = findOffsetByAutoCorr(data, "ch3", "ch4", 3*SPS, SPS, 10, SPS )
+    off_ch3_ch5 = findOffsetByAutoCorr(data, "ch3", "ch5", 3*SPS, SPS, 10, SPS )
+    
+    off_ch4_ch5 = findOffsetByAutoCorr(data, "ch4", "ch5", 3*SPS, SPS, 10, SPS )
+    
+    print(f"""
+          Przesunięcie ch1 <-> ch2: {off_ch1_ch2} sekund
+          przesunięcie ch1 <-> ch3: {off_ch1_ch3} sekund
+          przesunięcie ch1 <-> ch4: {off_ch1_ch4} sekund
+          przesunięcie ch1 <-> ch5: {off_ch1_ch5} sekund
+          
+          przesunięcie ch2 <-> ch3: {off_ch2_ch3} sekund
+          przesunięcie ch2 <-> ch4: {off_ch2_ch4} sekund
+          przesunięcie ch2 <-> ch5: {off_ch2_ch5} sekund
+          
+          przesunięcie ch3 <-> ch4: {off_ch3_ch4} sekund
+          przesunięcie ch3 <-> ch5: {off_ch3_ch5} sekund
+          
+          przesunięcie ch4 <-> ch5: {off_ch4_ch5} sekund
           """)
     
-    drawDescriptiveStats(data["ch2"], "Kanał CH2", ch2_stats, 15, 5)
-    print(f"""Kanał: CH2
-          Średnia: {ch2_stats["mean"]}
-          Mediana: {ch2_stats["median"]}
-          Minimum: {ch2_stats["min"]}
-          Maksimum: {ch2_stats["max"]}
-          Odchylenie: {ch2_stats["std"]}
-          Wariancja: {ch2_stats["var"]}
-          """)
+    # INFO: Punkt 4 - okresowość
     
-    drawDescriptiveStats(data["ch3"], "Kanał CH3", ch3_stats, 15, 5)
-    print(f"""Kanał: CH3
-          Średnia: {ch3_stats["mean"]}
-          Mediana: {ch3_stats["median"]}
-          Minimum: {ch3_stats["min"]}
-          Maksimum: {ch3_stats["max"]}
-          Odchylenie: {ch3_stats["std"]}
-          Wariancja: {ch3_stats["var"]}
-          """)
+    # drawAutocorrelation(autocorrelation(data), "Autokorelacja", False, 0.8)
     
-    drawDescriptiveStats(data["ch4"], "Kanał CH4", ch4_stats, 15, 5)
-    print(f"""Kanał: CH4
-          Średnia: {ch4_stats["mean"]}
-          Mediana: {ch4_stats["median"]}
-          Minimum: {ch4_stats["min"]}
-          Maksimum: {ch4_stats["max"]}
-          Odchylenie: {ch4_stats["std"]}
-          Wariancja: {ch4_stats["var"]}
-          """)
+    # min_ch1 = findMinimumsByAutoCorr(data, "ch1", 3*SPS, SPS, 10, True)
+    # min_ch2 = findMinimumsByAutoCorr(data, "ch2", 3*SPS, SPS, 10, True)
+    # min_ch3 = findMinimumsByAutoCorr(data, "ch3", 3*SPS, SPS, 10, True)
+    # min_ch4 = findMinimumsByAutoCorr(data, "ch4", 3*SPS, SPS, 10, True)
+    # min_ch5 = findMinimumsByAutoCorr(data, "ch5", 3*SPS, SPS, 10, True)
     
-    drawDescriptiveStats(data["ch5"], "Kanał CH5", ch5_stats, 15, 5)
-    print(f"""Kanał: CH5
-          Średnia: {ch5_stats["mean"]}
-          Mediana: {ch5_stats["median"]}
-          Minimum: {ch5_stats["min"]}
-          Maksimum: {ch5_stats["max"]}
-          Odchylenie: {ch5_stats["std"]}
-          Wariancja: {ch5_stats["var"]}
-          """)
+    # ch1_split, ch1_keys = dataSplit(data, min_ch1, "ch1")
+    # ch2_split, ch2_keys = dataSplit(data, min_ch2, "ch2")
+    # ch3_split, ch3_keys = dataSplit(data, min_ch3, "ch3")
+    # ch4_split, ch4_keys = dataSplit(data, min_ch4, "ch4")
+    # ch5_split, ch5_keys = dataSplit(data, min_ch5, "ch5")
+    
+    # print(calculatePeriods(ch1_split, ch1_keys))
+    # print(calculatePeriods(ch2_split, ch2_keys))
+    # print(calculatePeriods(ch3_split, ch3_keys))
+    # print(calculatePeriods(ch4_split, ch4_keys))
+    # print(calculatePeriods(ch5_split, ch5_keys))
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
