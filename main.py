@@ -1209,13 +1209,373 @@ def main(args = None):
     }
     
     data3 = {
-        "data": ch1_sample_mean_2,
+        "data": ch1_sample_mean_16,
+        "label": "CH1/16",
+        "color": "blue"
+    }    
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
+    
+    data1 = {
+        "data": ch2_sample_mean,
+        "label": "CH2",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch2_sample_mean_2,
+        "label": "CH2/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch2_sample_mean_16,
+        "label": "CH2/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
+    
+    data1 = {
+        "data": ch3_sample_mean,
+        "label": "CH3",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch3_sample_mean_2,
+        "label": "CH3/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch3_sample_mean_16,
+        "label": "CH3/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
+    
+    data1 = {
+        "data": ch4_sample_mean,
+        "label": "CH4",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch4_sample_mean_2,
+        "label": "CH4/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch4_sample_mean_16,
+        "label": "CH4/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
+    
+    data1 = {
+        "data": ch5_sample_mean,
+        "label": "CH5",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch5_sample_mean_2,
+        "label": "CH5/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch5_sample_mean_16,
+        "label": "CH5/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
+    
+    data1 = {
+        "data": ch1_sample_var,
+        "label": "CH1",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch1_sample_var_2,
+        "label": "CH1/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch1_sample_var_16,
         "label": "CH1/16",
         "color": "blue"
     }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
     
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
+    data1 = {
+        "data": ch2_sample_var,
+        "label": "CH2",
+        "color": "red"
+    }
     
+    data2 = {
+        "data": ch2_sample_var_2,
+        "label": "CH2/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch2_sample_var_16,
+        "label": "CH2/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
+    
+    data1 = {
+        "data": ch3_sample_var,
+        "label": "CH3",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch3_sample_var_2,
+        "label": "CH3/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch3_sample_var_16,
+        "label": "CH3/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
+    
+    data1 = {
+        "data": ch4_sample_var,
+        "label": "CH4",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch4_sample_var_2,
+        "label": "CH4/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch4_sample_var_16,
+        "label": "CH4/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
+    
+    data1 = {
+        "data": ch5_sample_var,
+        "label": "CH5",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch5_sample_var_2,
+        "label": "CH5/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch5_sample_var_16,
+        "label": "CH5/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
+    
+    
+    data1 = {
+        "data": ch1_zero_cross,
+        "label": "CH1",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch1_zero_cross_2,
+        "label": "CH1/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch1_zero_cross_16,
+        "label": "CH1/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
+    
+    data1 = {
+        "data": ch2_zero_cross,
+        "label": "CH2",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch2_zero_cross_2,
+        "label": "CH2/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch2_zero_cross_16,
+        "label": "CH2/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
+    
+    data1 = {
+        "data": ch3_zero_cross,
+        "label": "CH3",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch3_zero_cross_2,
+        "label": "CH3/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch3_zero_cross_16,
+        "label": "CH3/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
+    
+    data1 = {
+        "data": ch4_zero_cross,
+        "label": "CH4",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch4_zero_cross_2,
+        "label": "CH4/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch4_zero_cross_16,
+        "label": "CH4/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
+    
+    data1 = {
+        "data": ch5_zero_cross,
+        "label": "CH5",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch5_zero_cross_2,
+        "label": "CH5/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch5_zero_cross_16,
+        "label": "CH5/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
+    
+    data1 = {
+        "data": ch1_mean_cross,
+        "label": "CH1",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch1_mean_cross_2,
+        "label": "CH1/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch1_mean_cross_16,
+        "label": "CH1/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
+    
+    data1 = {
+        "data": ch2_mean_cross,
+        "label": "CH2",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch2_mean_cross_2,
+        "label": "CH2/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch2_mean_cross_16,
+        "label": "CH2/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
+    
+    data1 = {
+        "data": ch3_mean_cross,
+        "label": "CH3",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch3_mean_cross_2,
+        "label": "CH3/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch3_mean_cross_16,
+        "label": "CH3/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
+    
+    data1 = {
+        "data": ch4_mean_cross,
+        "label": "CH4",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch4_mean_cross_2,
+        "label": "CH4/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch4_mean_cross_16,
+        "label": "CH4/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
+    
+    data1 = {
+        "data": ch5_mean_cross,
+        "label": "CH5",
+        "color": "red"
+    }
+    
+    data2 = {
+        "data": ch5_mean_cross_2,
+        "label": "CH5/2",
+        "color": "green"
+    }
+    
+    data3 = {
+        "data": ch5_mean_cross_16,
+        "label": "CH5/16",
+        "color": "blue"
+    }
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
