@@ -1198,20 +1198,23 @@ def main(args = None):
     
     data1 = {
         "data": ch1_sample_mean,
-        "label": "CH1"
+        "label": "CH1",
+        "color": "red"
     }
     
     data2 = {
         "data": ch1_sample_mean_2,
-        "label": "CH1/2"
+        "label": "CH1/2",
+        "color": "green"
     }
     
     data3 = {
         "data": ch1_sample_mean_2,
-        "label": "CH1/16"
+        "label": "CH1/16",
+        "color": "blue"
     }
     
-    drawPlotXD(data1, data2, data3, overlaid= True, title="Średnia próbki dla różnej skali")
+    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
     
     
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
