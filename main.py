@@ -538,7 +538,6 @@ def drawPlotXD(*args, over_laid: bool = True, width: int = 15, height: int = 5, 
         
         for item in args:
             if isinstance(item, dict):
-                logger.debug(f"{item!r}")
                 plt.plot(item["data"],
                          "o" if "draw_line" in item and not item["draw_line"] else "",
                          label=item["label"] if "label" in item else "",
@@ -560,7 +559,6 @@ def drawPlotXD(*args, over_laid: bool = True, width: int = 15, height: int = 5, 
             plt.ylabel(ylabel)
             plt.title(title)
             if isinstance(item, dict):
-                logger.debug(f"{item!r}")
                 plt.plot(item["data"],
                          "o" if "draw_line" in item and not item["draw_line"] else "",
                          label=item["label"] if "label" in item else "",
@@ -726,7 +724,7 @@ def __sampleFun(data: pd.DataFrame, channel, new_sps, ret: dict) -> None:
     d_var["mean"] = mean(var)
     
     d_diff0 = dict()
-    d_diff0["var"] = diff0
+    d_diff0["val"] = diff0
     d_diff0["mean"] = mean(diff0)
     
     d_mean_cross = dict()
@@ -1399,21 +1397,330 @@ def main(args = None):
         "label": "CH1_8KS",
         "color": "#ff00ff"
     }
-    
     data2={
-        "data": K2_data["ch1"]["mean"]["val"],
-        "label": "CH1_2KS",
+        "data": K8_data["ch2"]["mean"]["val"],
+        "label": "CH2_8KS",
         "color": "#9400d3"
     }
-    
     data3={
-        "data": K05_data["ch1"]["mean"]["val"],
-        "label": "CH1_0,5KS",
+        "data": K8_data["ch3"]["mean"]["val"],
+        "label": "CH3_8KS",
         "color": "#00ffff"
     }
+    data4={
+        "data": K8_data["ch4"]["mean"]["val"],
+        "label": "CH4_8KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K8_data["ch5"]["mean"]["val"],
+        "label": "CH5_8KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Wartość średnia z próbki 1 sekunda")
     
-    drawPlotXD(data1, data2, data3, over_laid=False, xlabel="Próbka", ylabel="Wartość", title="Wartość średnia z próbki 1 sekunda")
+    data1={
+        "data": K2_data["ch1"]["mean"]["val"],
+        "label": "CH1_2KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K2_data["ch2"]["mean"]["val"],
+        "label": "CH2_2KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K2_data["ch3"]["mean"]["val"],
+        "label": "CH3_2KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K2_data["ch4"]["mean"]["val"],
+        "label": "CH4_2KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K2_data["ch5"]["mean"]["val"],
+        "label": "CH5_2KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Wartość średnia z próbki 1 sekunda")
     
+    data1={
+        "data": K05_data["ch1"]["mean"]["val"],
+        "label": "CH1_0.5KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K05_data["ch2"]["mean"]["val"],
+        "label": "CH2_0.5KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K05_data["ch3"]["mean"]["val"],
+        "label": "CH3_0.5KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K05_data["ch4"]["mean"]["val"],
+        "label": "CH4_0.5KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K05_data["ch5"]["mean"]["val"],
+        "label": "CH5_0.5KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Wartość średnia z próbki 1 sekunda")
+    
+    ###
+    
+    data1={
+        "data": K8_data["ch1"]["var"]["val"],
+        "label": "CH1_8KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K8_data["ch2"]["var"]["val"],
+        "label": "CH2_8KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K8_data["ch3"]["var"]["val"],
+        "label": "CH3_8KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K8_data["ch4"]["var"]["val"],
+        "label": "CH4_8KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K8_data["ch5"]["var"]["val"],
+        "label": "CH5_8KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki 1 sekunda")
+    
+    data1={
+        "data": K2_data["ch1"]["var"]["val"],
+        "label": "CH1_2KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K2_data["ch2"]["var"]["val"],
+        "label": "CH2_2KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K2_data["ch3"]["var"]["val"],
+        "label": "CH3_2KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K2_data["ch4"]["var"]["val"],
+        "label": "CH4_2KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K2_data["ch5"]["var"]["val"],
+        "label": "CH5_2KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki 1 sekunda")
+    
+    data1={
+        "data": K05_data["ch1"]["var"]["val"],
+        "label": "CH1_0.5KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K05_data["ch2"]["var"]["val"],
+        "label": "CH2_0.5KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K05_data["ch3"]["var"]["val"],
+        "label": "CH3_0.5KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K05_data["ch4"]["var"]["val"],
+        "label": "CH4_0.5KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K05_data["ch5"]["var"]["val"],
+        "label": "CH5_0.5KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki 1 sekunda")
+    
+    ###
+    
+    data1={
+        "data": K8_data["ch1"]["diff0"]["val"],
+        "label": "CH1_8KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K8_data["ch2"]["diff0"]["val"],
+        "label": "CH2_8KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K8_data["ch3"]["diff0"]["val"],
+        "label": "CH3_8KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K8_data["ch4"]["diff0"]["val"],
+        "label": "CH4_8KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K8_data["ch5"]["diff0"]["val"],
+        "label": "CH5_8KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Liczba przejść pochodnej przez 0 z próbki 1 sekunda")
+    
+    data1={
+        "data": K2_data["ch1"]["diff0"]["val"],
+        "label": "CH1_2KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K2_data["ch2"]["diff0"]["val"],
+        "label": "CH2_2KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K2_data["ch3"]["diff0"]["val"],
+        "label": "CH3_2KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K2_data["ch4"]["diff0"]["val"],
+        "label": "CH4_2KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K2_data["ch5"]["diff0"]["val"],
+        "label": "CH5_2KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Liczba przejść pochodnej przez 0 z próbki 1 sekunda")
+    
+    data1={
+        "data": K05_data["ch1"]["diff0"]["val"],
+        "label": "CH1_0.5KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K05_data["ch2"]["diff0"]["val"],
+        "label": "CH2_0.5KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K05_data["ch3"]["diff0"]["val"],
+        "label": "CH3_0.5KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K05_data["ch4"]["diff0"]["val"],
+        "label": "CH4_0.5KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K05_data["ch5"]["diff0"]["val"],
+        "label": "CH5_0.5KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Liczba przejść pochodnej przez 0 z próbki 1 sekunda")
+    
+    ###
+    
+    data1={
+        "data": K8_data["ch1"]["mean_cross"]["val"],
+        "label": "CH1_8KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K8_data["ch2"]["mean_cross"]["val"],
+        "label": "CH2_8KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K8_data["ch3"]["mean_cross"]["val"],
+        "label": "CH3_8KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K8_data["ch4"]["mean_cross"]["val"],
+        "label": "CH4_8KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K8_data["ch5"]["mean_cross"]["val"],
+        "label": "CH5_8KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Liczba przejść przez średnią wartość z próbki 1 sekunda")
+    
+    data1={
+        "data": K2_data["ch1"]["mean_cross"]["val"],
+        "label": "CH1_2KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K2_data["ch2"]["mean_cross"]["val"],
+        "label": "CH2_2KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K2_data["ch3"]["mean_cross"]["val"],
+        "label": "CH3_2KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K2_data["ch4"]["mean_cross"]["val"],
+        "label": "CH4_2KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K2_data["ch5"]["mean_cross"]["val"],
+        "label": "CH5_2KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Liczba przejść przez średnią wartość z próbki 1 sekunda")
+    
+    data1={
+        "data": K05_data["ch1"]["mean_cross"]["val"],
+        "label": "CH1_0.5KS",
+        "color": "#ff00ff"
+    }
+    data2={
+        "data": K05_data["ch2"]["mean_cross"]["val"],
+        "label": "CH2_0.5KS",
+        "color": "#9400d3"
+    }
+    data3={
+        "data": K05_data["ch3"]["mean_cross"]["val"],
+        "label": "CH3_0.5KS",
+        "color": "#00ffff"
+    }
+    data4={
+        "data": K05_data["ch4"]["mean_cross"]["val"],
+        "label": "CH4_0.5KS",
+        "color": "#ffa500"
+    }
+    data5={
+        "data": K05_data["ch5"]["mean_cross"]["val"],
+        "label": "CH5_0.5KS",
+        "color": "#ff4500"
+    }
+    drawPlotXD(data1, data2, data3, data4, data5, over_laid=True, xlabel="Próbka", ylabel="Wartość", title="Liczba przejść przez średnią wartość z próbki 1 sekunda")
     
     print(f"""
           Próbkowanie 8KS
@@ -1422,18 +1729,78 @@ def main(args = None):
                 Wariancja: {K8_data["ch1"]["var"]["mean"]}
                 Cross pochodna: {K8_data["ch1"]["diff0"]["mean"]}
                 Cross średnia: {K8_data["ch1"]["mean_cross"]["mean"]}
+            CH2
+                Średnia: {K8_data["ch2"]["mean"]["mean"]}
+                Wariancja: {K8_data["ch2"]["var"]["mean"]}
+                Cross pochodna: {K8_data["ch2"]["diff0"]["mean"]}
+                Cross średnia: {K8_data["ch2"]["mean_cross"]["mean"]}
+            CH3
+                Średnia: {K8_data["ch3"]["mean"]["mean"]}
+                Wariancja: {K8_data["ch3"]["var"]["mean"]}
+                Cross pochodna: {K8_data["ch3"]["diff0"]["mean"]}
+                Cross średnia: {K8_data["ch3"]["mean_cross"]["mean"]}
+            CH4
+                Średnia: {K8_data["ch4"]["mean"]["mean"]}
+                Wariancja: {K8_data["ch4"]["var"]["mean"]}
+                Cross pochodna: {K8_data["ch4"]["diff0"]["mean"]}
+                Cross średnia: {K8_data["ch4"]["mean_cross"]["mean"]}
+            CH5
+                Średnia: {K8_data["ch5"]["mean"]["mean"]}
+                Wariancja: {K8_data["ch5"]["var"]["mean"]}
+                Cross pochodna: {K8_data["ch5"]["diff0"]["mean"]}
+                Cross średnia: {K8_data["ch5"]["mean_cross"]["mean"]}
           Próbkowanie 2KS
             CH1
                 Średnia: {K2_data["ch1"]["mean"]["mean"]}
                 Wariancja: {K2_data["ch1"]["var"]["mean"]}
                 Cross pochodna: {K2_data["ch1"]["diff0"]["mean"]}
                 Cross średnia: {K2_data["ch1"]["mean_cross"]["mean"]}
+            CH2
+                Średnia: {K2_data["ch2"]["mean"]["mean"]}
+                Wariancja: {K2_data["ch2"]["var"]["mean"]}
+                Cross pochodna: {K2_data["ch2"]["diff0"]["mean"]}
+                Cross średnia: {K2_data["ch2"]["mean_cross"]["mean"]}
+            CH3
+                Średnia: {K2_data["ch3"]["mean"]["mean"]}
+                Wariancja: {K2_data["ch3"]["var"]["mean"]}
+                Cross pochodna: {K2_data["ch3"]["diff0"]["mean"]}
+                Cross średnia: {K2_data["ch3"]["mean_cross"]["mean"]}
+            CH4
+                Średnia: {K2_data["ch4"]["mean"]["mean"]}
+                Wariancja: {K2_data["ch4"]["var"]["mean"]}
+                Cross pochodna: {K2_data["ch4"]["diff0"]["mean"]}
+                Cross średnia: {K2_data["ch4"]["mean_cross"]["mean"]}
+            CH5
+                Średnia: {K2_data["ch5"]["mean"]["mean"]}
+                Wariancja: {K2_data["ch5"]["var"]["mean"]}
+                Cross pochodna: {K2_data["ch5"]["diff0"]["mean"]}
+                Cross średnia: {K2_data["ch5"]["mean_cross"]["mean"]}
           Próbkowanie 0,5KS
             CH1
                 Średnia: {K05_data["ch1"]["mean"]["mean"]}
                 Wariancja: {K05_data["ch1"]["var"]["mean"]}
                 Cross pochodna: {K05_data["ch1"]["diff0"]["mean"]}
                 Cross średnia: {K05_data["ch1"]["mean_cross"]["mean"]}
+            CH2
+                Średnia: {K05_data["ch2"]["mean"]["mean"]}
+                Wariancja: {K05_data["ch2"]["var"]["mean"]}
+                Cross pochodna: {K05_data["ch2"]["diff0"]["mean"]}
+                Cross średnia: {K05_data["ch2"]["mean_cross"]["mean"]}
+            CH3
+                Średnia: {K05_data["ch3"]["mean"]["mean"]}
+                Wariancja: {K05_data["ch3"]["var"]["mean"]}
+                Cross pochodna: {K05_data["ch3"]["diff0"]["mean"]}
+                Cross średnia: {K05_data["ch3"]["mean_cross"]["mean"]}
+            CH4
+                Średnia: {K05_data["ch4"]["mean"]["mean"]}
+                Wariancja: {K05_data["ch4"]["var"]["mean"]}
+                Cross pochodna: {K05_data["ch4"]["diff0"]["mean"]}
+                Cross średnia: {K05_data["ch4"]["mean_cross"]["mean"]}
+            CH5
+                Średnia: {K05_data["ch5"]["mean"]["mean"]}
+                Wariancja: {K05_data["ch5"]["var"]["mean"]}
+                Cross pochodna: {K05_data["ch5"]["diff0"]["mean"]}
+                Cross średnia: {K05_data["ch5"]["mean_cross"]["mean"]}
           """)
 
         
