@@ -699,6 +699,49 @@ def timeIntervals(data: pd.DataFrame, column: str, ord: int = SPS) -> list:
 
     return time_diff   
 
+# %%
+def __sampleFun(data: pd.DataFrame, channel, new_sps, ret: dict) -> None:
+    l_mean = []
+    var = []
+    diff0 = []
+    mean_cross = []
+    
+    for i in range(0, data[channel].size, new_sps):
+        sample = data[channel][i: i+new_sps]
+        l_mean.append(sample.mean())
+        var.append(sample.var())
+        
+        (val, point) = cuttingZeroCount(sample.diff())
+        diff0.append(val)
+        
+        (val2, point2) = cuttingMeanCount(sample)
+        mean_cross.append(val2)
+    
+    d_mean = dict()
+    d_mean["val"] = l_mean
+    d_mean["mean"] = mean(l_mean)
+    
+    d_var = dict()
+    d_var["val"] = var
+    d_var["mean"] = mean(var)
+    
+    d_diff0 = dict()
+    d_diff0["var"] = diff0
+    d_diff0["mean"] = mean(diff0)
+    
+    d_mean_cross = dict()
+    d_mean_cross["val"] = mean_cross
+    d_mean_cross["mean"] = mean(mean_cross)
+    
+    d_channel = dict()
+    
+    d_channel["mean"] = d_mean
+    d_channel["var"] = d_var
+    d_channel["diff0"] = d_diff0
+    d_channel["mean_cross"] = d_mean_cross
+    
+    ret[channel] = d_channel
+
 # %%    
 def main(args = None):
     """Use logging insted of print for cleaner output
@@ -842,744 +885,560 @@ def main(args = None):
     
     # INFO: Punkt 5 - skala /1 
     
-    ch1_sample_mean = []
-    ch1_sample_var = []
-    ch1_zero_cross = []
-    ch1_mean_cross = []
+    # ch1_sample_mean = []
+    # ch1_sample_var = []
+    # ch1_zero_cross = []
+    # ch1_mean_cross = []
     
-    for i in range(0, data["ch1"].size, SPS):
-        sample = data["ch1"][i: i+SPS]
-        ch1_sample_mean.append(sample.mean())
-        ch1_sample_var.append(sample.var())
+    # for i in range(0, data["ch1"].size, SPS):
+    #     sample = data["ch1"][i: i+SPS]
+    #     ch1_sample_mean.append(sample.mean())
+    #     ch1_sample_var.append(sample.var())
         
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch1_zero_cross.append(val)
+    #     (val, point) = cuttingZeroCount(sample.diff())
+    #     ch1_zero_cross.append(val)
         
-        (val2, point2) = cuttingMeanCount(sample)
-        ch1_mean_cross.append(val2)
+    #     (val2, point2) = cuttingMeanCount(sample)
+    #     ch1_mean_cross.append(val2)
     
-    # drawPlotXD(ch1_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH1")
-    # drawPlotXD(ch1_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH1")
-    # drawPlotXD(ch1_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH1")
-    # drawPlotXD(ch1_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH1")
+    # # drawPlotXD(ch1_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH1")
+    # # drawPlotXD(ch1_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH1")
+    # # drawPlotXD(ch1_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH1")
+    # # drawPlotXD(ch1_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH1")
     
-    ch2_sample_mean = []
-    ch2_sample_var = []
-    ch2_zero_cross = []
-    ch2_mean_cross = []
+    # ch2_sample_mean = []
+    # ch2_sample_var = []
+    # ch2_zero_cross = []
+    # ch2_mean_cross = []
     
-    for i in range(0, data["ch2"].size, SPS):
-        sample = data["ch2"][i: i+SPS]
-        ch2_sample_mean.append(sample.mean())
-        ch2_sample_var.append(sample.var())
+    # for i in range(0, data["ch2"].size, SPS):
+    #     sample = data["ch2"][i: i+SPS]
+    #     ch2_sample_mean.append(sample.mean())
+    #     ch2_sample_var.append(sample.var())
         
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch2_zero_cross.append(val)
+    #     (val, point) = cuttingZeroCount(sample.diff())
+    #     ch2_zero_cross.append(val)
         
-        (val2, point2) = cuttingMeanCount(sample)
-        ch2_mean_cross.append(val2)
+    #     (val2, point2) = cuttingMeanCount(sample)
+    #     ch2_mean_cross.append(val2)
         
-    # drawPlotXD(ch2_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH2")
-    # drawPlotXD(ch2_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH2")
-    # drawPlotXD(ch2_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH2")
-    # drawPlotXD(ch2_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH2")
+    # # drawPlotXD(ch2_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH2")
+    # # drawPlotXD(ch2_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH2")
+    # # drawPlotXD(ch2_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH2")
+    # # drawPlotXD(ch2_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH2")
     
-    ch3_sample_mean = []
-    ch3_sample_var = []
-    ch3_zero_cross = []
-    ch3_mean_cross = []
+    # ch3_sample_mean = []
+    # ch3_sample_var = []
+    # ch3_zero_cross = []
+    # ch3_mean_cross = []
     
-    for i in range(0, data["ch3"].size, SPS):
-        sample = data["ch3"][i: i+SPS]
-        ch3_sample_mean.append(sample.mean())
-        ch3_sample_var.append(sample.var())
+    # for i in range(0, data["ch3"].size, SPS):
+    #     sample = data["ch3"][i: i+SPS]
+    #     ch3_sample_mean.append(sample.mean())
+    #     ch3_sample_var.append(sample.var())
         
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch3_zero_cross.append(val)
+    #     (val, point) = cuttingZeroCount(sample.diff())
+    #     ch3_zero_cross.append(val)
         
-        (val2, point2) = cuttingMeanCount(sample)
-        ch3_mean_cross.append(val2)
+    #     (val2, point2) = cuttingMeanCount(sample)
+    #     ch3_mean_cross.append(val2)
     
-    # drawPlotXD(ch3_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH3")
-    # drawPlotXD(ch3_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH3")
-    # drawPlotXD(ch3_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH3")
-    # drawPlotXD(ch3_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH3")
+    # # drawPlotXD(ch3_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH3")
+    # # drawPlotXD(ch3_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH3")
+    # # drawPlotXD(ch3_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH3")
+    # # drawPlotXD(ch3_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH3")
     
-    ch4_sample_mean = []
-    ch4_sample_var = []
-    ch4_zero_cross = []
-    ch4_mean_cross = []
+    # ch4_sample_mean = []
+    # ch4_sample_var = []
+    # ch4_zero_cross = []
+    # ch4_mean_cross = []
     
-    for i in range(0, data["ch4"].size, SPS):
-        sample = data["ch4"][i: i+SPS]
-        ch4_sample_mean.append(sample.mean())
-        ch4_sample_var.append(sample.var())
+    # for i in range(0, data["ch4"].size, SPS):
+    #     sample = data["ch4"][i: i+SPS]
+    #     ch4_sample_mean.append(sample.mean())
+    #     ch4_sample_var.append(sample.var())
         
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch4_zero_cross.append(val)
+    #     (val, point) = cuttingZeroCount(sample.diff())
+    #     ch4_zero_cross.append(val)
         
-        (val2, point2) = cuttingMeanCount(sample)
-        ch4_mean_cross.append(val2)
+    #     (val2, point2) = cuttingMeanCount(sample)
+    #     ch4_mean_cross.append(val2)
     
-    # drawPlotXD(ch4_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH4")
-    # drawPlotXD(ch4_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH4")
-    # drawPlotXD(ch4_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH4")
-    # drawPlotXD(ch4_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH4")
+    # # drawPlotXD(ch4_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH4")
+    # # drawPlotXD(ch4_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH4")
+    # # drawPlotXD(ch4_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH4")
+    # # drawPlotXD(ch4_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH4")
     
-    ch5_sample_mean = []
-    ch5_sample_var = []
-    ch5_zero_cross = []
-    ch5_mean_cross = []
+    # ch5_sample_mean = []
+    # ch5_sample_var = []
+    # ch5_zero_cross = []
+    # ch5_mean_cross = []
     
-    for i in range(0, data["ch5"].size, SPS):
-        sample = data["ch5"][i: i+SPS]
-        ch5_sample_mean.append(sample.mean())
-        ch5_sample_var.append(sample.var())
+    # for i in range(0, data["ch5"].size, SPS):
+    #     sample = data["ch5"][i: i+SPS]
+    #     ch5_sample_mean.append(sample.mean())
+    #     ch5_sample_var.append(sample.var())
         
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch5_zero_cross.append(val)
+    #     (val, point) = cuttingZeroCount(sample.diff())
+    #     ch5_zero_cross.append(val)
         
-        (val2, point2) = cuttingMeanCount(sample)
-        ch5_mean_cross.append(val2)    
+    #     (val2, point2) = cuttingMeanCount(sample)
+    #     ch5_mean_cross.append(val2)    
         
-    # drawPlotXD(ch5_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH5")
-    # drawPlotXD(ch5_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH5")
-    # drawPlotXD(ch5_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH5")
-    # drawPlotXD(ch5_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH5")
+    # # drawPlotXD(ch5_sample_mean, xlabel="Próbka", ylabel="Wartość", title="Średnia z próbki CH5")
+    # # drawPlotXD(ch5_sample_var, xlabel="Próbka", ylabel="Wartość", title="Wariancja z próbki CH5")
+    # # drawPlotXD(ch5_zero_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez 0 pochodnej próbki CH5")
+    # # drawPlotXD(ch5_mean_cross, xlabel="Próbka", ylabel="Wartość", title="Przejścia przez średnią wartość próbki CH5")
     
-    print(f"""
-          CH1 mean mean: {mean(ch1_sample_mean)}
-          CH2 mean mean: {mean(ch2_sample_mean)}
-          CH3 mean mean: {mean(ch3_sample_mean)}
-          CH4 mean mean: {mean(ch4_sample_mean)}
-          CH5 mean mean: {mean(ch5_sample_mean)}
+    # print(f"""
+    #       CH1 mean mean: {mean(ch1_sample_mean)}
+    #       CH2 mean mean: {mean(ch2_sample_mean)}
+    #       CH3 mean mean: {mean(ch3_sample_mean)}
+    #       CH4 mean mean: {mean(ch4_sample_mean)}
+    #       CH5 mean mean: {mean(ch5_sample_mean)}
           
-          CH1 var mean: {mean(ch1_sample_var)}
-          CH2 var mean: {mean(ch2_sample_var)}
-          CH3 var mean: {mean(ch3_sample_var)}
-          CH4 var mean: {mean(ch4_sample_var)}
-          CH5 var mean: {mean(ch5_sample_var)}
+    #       CH1 var mean: {mean(ch1_sample_var)}
+    #       CH2 var mean: {mean(ch2_sample_var)}
+    #       CH3 var mean: {mean(ch3_sample_var)}
+    #       CH4 var mean: {mean(ch4_sample_var)}
+    #       CH5 var mean: {mean(ch5_sample_var)}
           
-          CH1 zero cross mean: {mean(ch1_zero_cross)}
-          CH2 zero cross mean: {mean(ch2_zero_cross)}
-          CH3 zero cross mean: {mean(ch3_zero_cross)}
-          CH4 zero cross mean: {mean(ch4_zero_cross)}
-          CH5 zero cross mean: {mean(ch5_zero_cross)}
+    #       CH1 zero cross mean: {mean(ch1_zero_cross)}
+    #       CH2 zero cross mean: {mean(ch2_zero_cross)}
+    #       CH3 zero cross mean: {mean(ch3_zero_cross)}
+    #       CH4 zero cross mean: {mean(ch4_zero_cross)}
+    #       CH5 zero cross mean: {mean(ch5_zero_cross)}
           
-          CH1 mean cross mean: {mean(ch1_mean_cross)}
-          CH2 mean cross mean: {mean(ch2_mean_cross)}
-          CH3 mean cross mean: {mean(ch3_mean_cross)}
-          CH4 mean cross mean: {mean(ch4_mean_cross)}
-          CH5 mean cross mean: {mean(ch5_mean_cross)}
-          """)
+    #       CH1 mean cross mean: {mean(ch1_mean_cross)}
+    #       CH2 mean cross mean: {mean(ch2_mean_cross)}
+    #       CH3 mean cross mean: {mean(ch3_mean_cross)}
+    #       CH4 mean cross mean: {mean(ch4_mean_cross)}
+    #       CH5 mean cross mean: {mean(ch5_mean_cross)}
+    #       """)
     
     
     # INFO Skala / 2 
     
-    data_2 = reduceResolution(data, 2)
+    # data_2 = data.div(2)
     
-    ch1_sample_mean_2 = []
-    ch1_sample_var_2 = []
-    ch1_zero_cross_2 = []
-    ch1_mean_cross_2 = []
+    # ch1_sample_mean_2 = []
+    # ch1_sample_var_2 = []
     
-    for i in range(0, data_2["ch1"].size, SPS):
-        sample = data_2["ch1"][i: i+SPS]
-        ch1_sample_mean_2.append(sample.mean())
-        ch1_sample_var_2.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch1_zero_cross_2.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch1_mean_cross_2.append(val2)
+    # for i in range(0, data_2["ch1"].size, SPS):
+    #     sample = data_2["ch1"][i: i+SPS]
+    #     ch1_sample_mean_2.append(sample.mean())
+    #     ch1_sample_var_2.append(sample.var())
     
-    ch2_sample_mean_2 = []
-    ch2_sample_var_2 = []
-    ch2_zero_cross_2 = []
-    ch2_mean_cross_2 = []
+    # ch2_sample_mean_2 = []
+    # ch2_sample_var_2 = []
     
-    for i in range(0, data_2["ch2"].size, SPS):
-        sample = data_2["ch2"][i: i+SPS]
-        ch2_sample_mean_2.append(sample.mean())
-        ch2_sample_var_2.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch2_zero_cross_2.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch2_mean_cross_2.append(val2)
+    # for i in range(0, data_2["ch2"].size, SPS):
+    #     sample = data_2["ch2"][i: i+SPS]
+    #     ch2_sample_mean_2.append(sample.mean())
+    #     ch2_sample_var_2.append(sample.var())
     
-    ch3_sample_mean_2 = []
-    ch3_sample_var_2 = []
-    ch3_zero_cross_2 = []
-    ch3_mean_cross_2 = []
+    # ch3_sample_mean_2 = []
+    # ch3_sample_var_2 = []
     
-    for i in range(0, data_2["ch3"].size, SPS):
-        sample = data_2["ch3"][i: i+SPS]
-        ch3_sample_mean_2.append(sample.mean())
-        ch3_sample_var_2.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch3_zero_cross_2.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch3_mean_cross_2.append(val2)
+    # for i in range(0, data_2["ch3"].size, SPS):
+    #     sample = data_2["ch3"][i: i+SPS]
+    #     ch3_sample_mean_2.append(sample.mean())
+    #     ch3_sample_var_2.append(sample.var())
     
-    ch4_sample_mean_2 = []
-    ch4_sample_var_2 = []
-    ch4_zero_cross_2 = []
-    ch4_mean_cross_2 = []
+    # ch4_sample_mean_2 = []
+    # ch4_sample_var_2 = []
     
-    for i in range(0, data_2["ch4"].size, SPS):
-        sample = data_2["ch4"][i: i+SPS]
-        ch4_sample_mean_2.append(sample.mean())
-        ch4_sample_var_2.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch4_zero_cross_2.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch4_mean_cross_2.append(val2)
+    # for i in range(0, data_2["ch4"].size, SPS):
+    #     sample = data_2["ch4"][i: i+SPS]
+    #     ch4_sample_mean_2.append(sample.mean())
+    #     ch4_sample_var_2.append(sample.var())
     
-    ch5_sample_mean_2 = []
-    ch5_sample_var_2 = []
-    ch5_zero_cross_2 = []
-    ch5_mean_cross_2 = []
+    # ch5_sample_mean_2 = []
+    # ch5_sample_var_2 = []
     
-    for i in range(0, data_2["ch5"].size, SPS):
-        sample = data_2["ch5"][i: i+SPS]
-        ch5_sample_mean_2.append(sample.mean())
-        ch5_sample_var_2.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch5_zero_cross_2.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch5_mean_cross_2.append(val2)    
+    # for i in range(0, data_2["ch5"].size, SPS):
+    #     sample = data_2["ch5"][i: i+SPS]
+    #     ch5_sample_mean_2.append(sample.mean())
+    #     ch5_sample_var_2.append(sample.var())    
     
-    print(f"""
-          CH1 mean mean: {mean(ch1_sample_mean_2)}
-          CH2 mean mean: {mean(ch2_sample_mean_2)}
-          CH3 mean mean: {mean(ch3_sample_mean_2)}
-          CH4 mean mean: {mean(ch4_sample_mean_2)}
-          CH5 mean mean: {mean(ch5_sample_mean_2)}
+    # print(f"""
+    #       CH1 mean mean: {mean(ch1_sample_mean_2)}
+    #       CH2 mean mean: {mean(ch2_sample_mean_2)}
+    #       CH3 mean mean: {mean(ch3_sample_mean_2)}
+    #       CH4 mean mean: {mean(ch4_sample_mean_2)}
+    #       CH5 mean mean: {mean(ch5_sample_mean_2)}
           
-          CH1 var mean: {mean(ch1_sample_var_2)}
-          CH2 var mean: {mean(ch2_sample_var_2)}
-          CH3 var mean: {mean(ch3_sample_var_2)}
-          CH4 var mean: {mean(ch4_sample_var_2)}
-          CH5 var mean: {mean(ch5_sample_var_2)}
-          
-          CH1 zero cross mean: {mean(ch1_zero_cross_2)}
-          CH2 zero cross mean: {mean(ch2_zero_cross_2)}
-          CH3 zero cross mean: {mean(ch3_zero_cross_2)}
-          CH4 zero cross mean: {mean(ch4_zero_cross_2)}
-          CH5 zero cross mean: {mean(ch5_zero_cross_2)}
-          
-          CH1 mean cross mean: {mean(ch1_mean_cross_2)}
-          CH2 mean cross mean: {mean(ch2_mean_cross_2)}
-          CH3 mean cross mean: {mean(ch3_mean_cross_2)}
-          CH4 mean cross mean: {mean(ch4_mean_cross_2)}
-          CH5 mean cross mean: {mean(ch5_mean_cross_2)}
-          """)
+    #       CH1 var mean: {mean(ch1_sample_var_2)}
+    #       CH2 var mean: {mean(ch2_sample_var_2)}
+    #       CH3 var mean: {mean(ch3_sample_var_2)}
+    #       CH4 var mean: {mean(ch4_sample_var_2)}
+    #       CH5 var mean: {mean(ch5_sample_var_2)}
+    #       """)
     
     # INFO: Skala / 16
     
-    data_16 = reduceResolution(data, 16)
+    # data_16 = data.div(16)
     
-    ch1_sample_mean_16 = []
-    ch1_sample_var_16 = []
-    ch1_zero_cross_16 = []
-    ch1_mean_cross_16 = []
+    # ch1_sample_mean_16 = []
+    # ch1_sample_var_16 = []
     
-    for i in range(0, data_16["ch1"].size, SPS):
-        sample = data_16["ch1"][i: i+SPS]
-        ch1_sample_mean_16.append(sample.mean())
-        ch1_sample_var_16.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch1_zero_cross_16.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch1_mean_cross_16.append(val2)
+    # for i in range(0, data_16["ch1"].size, SPS):
+    #     sample = data_16["ch1"][i: i+SPS]
+    #     ch1_sample_mean_16.append(sample.mean())
+    #     ch1_sample_var_16.append(sample.var())
     
-    ch2_sample_mean_16 = []
-    ch2_sample_var_16 = []
-    ch2_zero_cross_16 = []
-    ch2_mean_cross_16 = []
+    # ch2_sample_mean_16 = []
+    # ch2_sample_var_16 = []
     
-    for i in range(0, data_16["ch2"].size, SPS):
-        sample = data_16["ch2"][i: i+SPS]
-        ch2_sample_mean_16.append(sample.mean())
-        ch2_sample_var_16.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch2_zero_cross_16.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch2_mean_cross_16.append(val2)
+    # for i in range(0, data_16["ch2"].size, SPS):
+    #     sample = data_16["ch2"][i: i+SPS]
+    #     ch2_sample_mean_16.append(sample.mean())
+    #     ch2_sample_var_16.append(sample.var())
     
-    ch3_sample_mean_16 = []
-    ch3_sample_var_16 = []
-    ch3_zero_cross_16 = []
-    ch3_mean_cross_16 = []
+    # ch3_sample_mean_16 = []
+    # ch3_sample_var_16 = []
     
-    for i in range(0, data_16["ch3"].size, SPS):
-        sample = data_16["ch3"][i: i+SPS]
-        ch3_sample_mean_16.append(sample.mean())
-        ch3_sample_var_16.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch3_zero_cross_16.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch3_mean_cross_16.append(val2)
+    # for i in range(0, data_16["ch3"].size, SPS):
+    #     sample = data_16["ch3"][i: i+SPS]
+    #     ch3_sample_mean_16.append(sample.mean())
+    #     ch3_sample_var_16.append(sample.var())
     
-    ch4_sample_mean_16 = []
-    ch4_sample_var_16 = []
-    ch4_zero_cross_16 = []
-    ch4_mean_cross_16 = []
+    # ch4_sample_mean_16 = []
+    # ch4_sample_var_16 = []
     
-    for i in range(0, data_16["ch4"].size, SPS):
-        sample = data_16["ch4"][i: i+SPS]
-        ch4_sample_mean_16.append(sample.mean())
-        ch4_sample_var_16.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch4_zero_cross_16.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch4_mean_cross_16.append(val2)
+    # for i in range(0, data_16["ch4"].size, SPS):
+    #     sample = data_16["ch4"][i: i+SPS]
+    #     ch4_sample_mean_16.append(sample.mean())
+    #     ch4_sample_var_16.append(sample.var())
     
-    ch5_sample_mean_16 = []
-    ch5_sample_var_16 = []
-    ch5_zero_cross_16 = []
-    ch5_mean_cross_16 = []
+    # ch5_sample_mean_16 = []
+    # ch5_sample_var_16 = []
     
-    for i in range(0, data_16["ch5"].size, SPS):
-        sample = data_16["ch5"][i: i+SPS]
-        ch5_sample_mean_16.append(sample.mean())
-        ch5_sample_var_16.append(sample.var())
-        
-        (val, point) = cuttingZeroCount(sample.diff())
-        ch5_zero_cross_16.append(val)
-        
-        (val2, point2) = cuttingMeanCount(sample)
-        ch5_mean_cross_16.append(val2)    
+    # for i in range(0, data_16["ch5"].size, SPS):
+    #     sample = data_16["ch5"][i: i+SPS]
+    #     ch5_sample_mean_16.append(sample.mean())
+    #     ch5_sample_var_16.append(sample.var())    
     
-    print(f"""
-          CH1 mean mean: {mean(ch1_sample_mean_16)}
-          CH2 mean mean: {mean(ch2_sample_mean_16)}
-          CH3 mean mean: {mean(ch3_sample_mean_16)}
-          CH4 mean mean: {mean(ch4_sample_mean_16)}
-          CH5 mean mean: {mean(ch5_sample_mean_16)}
+    # print(f"""
+    #       CH1 mean mean: {mean(ch1_sample_mean_16)}
+    #       CH2 mean mean: {mean(ch2_sample_mean_16)}
+    #       CH3 mean mean: {mean(ch3_sample_mean_16)}
+    #       CH4 mean mean: {mean(ch4_sample_mean_16)}
+    #       CH5 mean mean: {mean(ch5_sample_mean_16)}
           
-          CH1 var mean: {mean(ch1_sample_var_16)}
-          CH2 var mean: {mean(ch2_sample_var_16)}
-          CH3 var mean: {mean(ch3_sample_var_16)}
-          CH4 var mean: {mean(ch4_sample_var_16)}
-          CH5 var mean: {mean(ch5_sample_var_16)}
-          
-          CH1 zero cross mean: {mean(ch1_zero_cross_16)}
-          CH2 zero cross mean: {mean(ch2_zero_cross_16)}
-          CH3 zero cross mean: {mean(ch3_zero_cross_16)}
-          CH4 zero cross mean: {mean(ch4_zero_cross_16)}
-          CH5 zero cross mean: {mean(ch5_zero_cross_16)}
-          
-          CH1 mean cross mean: {mean(ch1_mean_cross_16)}
-          CH2 mean cross mean: {mean(ch2_mean_cross_16)}
-          CH3 mean cross mean: {mean(ch3_mean_cross_16)}
-          CH4 mean cross mean: {mean(ch4_mean_cross_16)}
-          CH5 mean cross mean: {mean(ch5_mean_cross_16)}
-          """)        
+    #       CH1 var mean: {mean(ch1_sample_var_16)}
+    #       CH2 var mean: {mean(ch2_sample_var_16)}
+    #       CH3 var mean: {mean(ch3_sample_var_16)}
+    #       CH4 var mean: {mean(ch4_sample_var_16)}
+    #       CH5 var mean: {mean(ch5_sample_var_16)}
+    #       """)        
     
     # INFO: Wykresy do skali - włączyć wszystkie skale wyżej
     
-    data1 = {
-        "data": ch1_sample_mean,
-        "label": "CH1",
-        "color": "red"
+    # data1 = {
+    #     "data": ch1_sample_mean,
+    #     "label": "CH1",
+    #     "color": "#ff0000"
+    # }
+    
+    # data2 = {
+    #     "data": ch1_sample_mean_2,
+    #     "label": "CH1/2",
+    #     "color": "#ff4300"
+    # }
+    
+    # data3 = {
+    #     "data": ch1_sample_mean_16,
+    #     "label": "CH1/16",
+    #     "color": "#ff6500"
+    # }
+    
+    # data4 = {
+    #     "data": ch2_sample_mean,
+    #     "label": "CH2",
+    #     "color": "#ffa500"
+    # }
+    
+    # data5 = {
+    #     "data": ch2_sample_mean_2,
+    #     "label": "CH2/2",
+    #     "color": "#ffc700"
+    # }
+    
+    # data6 = {
+    #     "data": ch2_sample_mean_16,
+    #     "label": "CH2/16",
+    #     "color": "#ffe900"
+    # }
+    
+    # data7 = {
+    #     "data": ch3_sample_mean,
+    #     "label": "CH3",
+    #     "color": "#7fffd4"
+    # }
+    
+    # data8 = {
+    #     "data": ch3_sample_mean_2,
+    #     "label": "CH3/2",
+    #     "color": "#7fffe5"
+    # }
+    
+    # data9 = {
+    #     "data": ch3_sample_mean_16,
+    #     "label": "CH3/16",
+    #     "color": "#7ffff6"
+    # }
+    
+    # data10 = {
+    #     "data": ch4_sample_mean,
+    #     "label": "CH4",
+    #     "color": "#1e90ff"
+    # }
+    
+    # data11 = {
+    #     "data": ch4_sample_mean_2,
+    #     "label": "CH4/2",
+    #     "color": "#1e90ff"
+    # }
+    
+    # data12 = {
+    #     "data": ch4_sample_mean_16,
+    #     "label": "CH4/16",
+    #     "color": "#1e52ff"
+    # }
+    
+    # data13 = {
+    #     "data": ch5_sample_mean,
+    #     "label": "CH5",
+    #     "color": "#da70d6"
+    # }
+    
+    # data14 = {
+    #     "data": ch5_sample_mean_2,
+    #     "label": "CH5/2",
+    #     "color": "#ff83e9"
+    # }
+    
+    # data15 = {
+    #     "data": ch5_sample_mean_16,
+    #     "label": "CH5/16",
+    #     "color": "#ff83e9"
+    # }
+    # drawPlotXD(data1, 
+    #            data2, 
+    #            data3, 
+    #            data4,
+    #            data5, 
+    #            data6,
+    #            data7,
+    #            data8,
+    #            data9,
+    #            data10,
+    #            data11,
+    #            data12,
+    #            data13,
+    #            data14, 
+    #            data15,
+    #            over_laid= True, 
+    #            title="Średnia próbki dla różnej skali")
+    
+    # data1 = {
+    #     "data": ch1_sample_var,
+    #     "label": "CH1",
+    #     "color": "#ff0000"
+    # }
+    
+    # data2 = {
+    #     "data": ch1_sample_var_2,
+    #     "label": "CH1/2",
+    #     "color": "#ff4300"
+    # }
+    
+    # data3 = {
+    #     "data": ch1_sample_var_16,
+    #     "label": "CH1/16",
+    #     "color": "#ff6500"
+    # }
+    
+    # data4 = {
+    #     "data": ch2_sample_var,
+    #     "label": "CH2",
+    #     "color": "#ffa500"
+    # }
+    
+    # data5 = {
+    #     "data": ch2_sample_var_2,
+    #     "label": "CH2/2",
+    #     "color": "#ffc700"
+    # }
+    
+    # data6 = {
+    #     "data": ch2_sample_var_16,
+    #     "label": "CH2/16",
+    #     "color": "#ffe900"
+    # }
+    
+    # data7 = {
+    #     "data": ch3_sample_var,
+    #     "label": "CH3",
+    #     "color": "#7fffd4"
+    # }
+    
+    # data8 = {
+    #     "data": ch3_sample_var_2,
+    #     "label": "CH3/2",
+    #     "color": "#7fffe5"
+    # }
+    
+    # data9 = {
+    #     "data": ch3_sample_var_16,
+    #     "label": "CH3/16",
+    #     "color": "#7ffff6"
+    # }
+    
+    # data10 = {
+    #     "data": ch4_sample_var,
+    #     "label": "CH4",
+    #     "color": "#1e90ff"
+    # }
+    
+    # data11 = {
+    #     "data": ch4_sample_var_2,
+    #     "label": "CH4/2",
+    #     "color": "#1e90ff"
+    # }
+    
+    # data12 = {
+    #     "data": ch4_sample_var_16,
+    #     "label": "CH4/16",
+    #     "color": "#1e52ff"
+    # }
+    
+    # data13 = {
+    #     "data": ch5_sample_var,
+    #     "label": "CH5",
+    #     "color": "#da70d6"
+    # }
+    
+    # data14 = {
+    #     "data": ch5_sample_var_2,
+    #     "label": "CH5/2",
+    #     "color": "#ff83e9"
+    # }
+    
+    # data15 = {
+    #     "data": ch5_sample_var_16,
+    #     "label": "CH5/16",
+    #     "color": "#ff83e9"
+    # }
+    # drawPlotXD(data1, 
+    #            data2, 
+    #            data3, 
+    #            data4,
+    #            data5, 
+    #            data6,
+    #            data7,
+    #            data8,
+    #            data9,
+    #            data10,
+    #            data11,
+    #            data12,
+    #            data13,
+    #            data14, 
+    #            data15,
+    #            over_laid= True, 
+    #            title="Wariancja próbki dla różnej skali")
+    
+    # INFO: punkt 6 - Zmiana próbkowania - normalne
+    
+    K8_data = dict().fromkeys(data.columns)
+    
+    threads = [None] * 15
+    
+    threads[0] = th.Thread(target=__sampleFun, args=(data, "ch1", SPS, K8_data))
+    threads[1] = th.Thread(target=__sampleFun, args=(data, "ch2", SPS, K8_data))
+    threads[2] = th.Thread(target=__sampleFun, args=(data, "ch3", SPS, K8_data))
+    threads[3] = th.Thread(target=__sampleFun, args=(data, "ch4", SPS, K8_data))
+    threads[4] = th.Thread(target=__sampleFun, args=(data, "ch5", SPS, K8_data))
+
+    
+    # INFO: Zmiana próbkowania - 2KS/s
+    
+    data2ks = reduceResolution(data, 4)
+    K2_data = dict().fromkeys(data2ks.columns)
+    
+    threads[5] = th.Thread(target=__sampleFun, args=(data2ks, "ch1", SPS // 4, K2_data))
+    threads[6] = th.Thread(target=__sampleFun, args=(data2ks, "ch2", SPS // 4, K2_data))
+    threads[7] = th.Thread(target=__sampleFun, args=(data2ks, "ch3", SPS // 4, K2_data))
+    threads[8] = th.Thread(target=__sampleFun, args=(data2ks, "ch4", SPS // 4, K2_data))
+    threads[9] = th.Thread(target=__sampleFun, args=(data2ks, "ch5", SPS // 4, K2_data))
+    
+    # INFO: Zmiana próbkowania - 0.5KS/s
+    
+    data05ks = reduceResolution(data, 16)
+    K05_data = dict().fromkeys(data05ks.columns)
+    
+    threads[10] = th.Thread(target=__sampleFun, args=(data05ks, "ch1", SPS // 16, K05_data))
+    threads[11] = th.Thread(target=__sampleFun, args=(data05ks, "ch2", SPS // 16, K05_data))
+    threads[12] = th.Thread(target=__sampleFun, args=(data05ks, "ch3", SPS // 16, K05_data))
+    threads[13] = th.Thread(target=__sampleFun, args=(data05ks, "ch4", SPS // 16, K05_data))
+    threads[14] = th.Thread(target=__sampleFun, args=(data05ks, "ch5", SPS // 16, K05_data))
+    
+    for thread in threads:
+        thread.start()
+        
+    for thread in threads:
+        thread.join()    
+    
+    print(len(K8_data["ch1"]["mean"]["val"]))
+    print(len(K2_data["ch1"]["mean"]["val"]))
+    print(len(K05_data["ch1"]["mean"]["val"]))
+    
+    data1={
+        "data": K8_data["ch1"]["mean"]["val"],
+        "label": "CH1_8KS",
+        "color": "#ff00ff"
     }
     
-    data2 = {
-        "data": ch1_sample_mean_2,
-        "label": "CH1/2",
-        "color": "green"
+    data2={
+        "data": K2_data["ch1"]["mean"]["val"],
+        "label": "CH1_2KS",
+        "color": "#9400d3"
     }
     
-    data3 = {
-        "data": ch1_sample_mean_16,
-        "label": "CH1/16",
-        "color": "blue"
-    }    
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch2_sample_mean,
-        "label": "CH2",
-        "color": "red"
+    data3={
+        "data": K05_data["ch1"]["mean"]["val"],
+        "label": "CH1_0,5KS",
+        "color": "#00ffff"
     }
     
-    data2 = {
-        "data": ch2_sample_mean_2,
-        "label": "CH2/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch2_sample_mean_16,
-        "label": "CH2/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch3_sample_mean,
-        "label": "CH3",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch3_sample_mean_2,
-        "label": "CH3/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch3_sample_mean_16,
-        "label": "CH3/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch4_sample_mean,
-        "label": "CH4",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch4_sample_mean_2,
-        "label": "CH4/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch4_sample_mean_16,
-        "label": "CH4/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch5_sample_mean,
-        "label": "CH5",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch5_sample_mean_2,
-        "label": "CH5/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch5_sample_mean_16,
-        "label": "CH5/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Średnia próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch1_sample_var,
-        "label": "CH1",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch1_sample_var_2,
-        "label": "CH1/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch1_sample_var_16,
-        "label": "CH1/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch2_sample_var,
-        "label": "CH2",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch2_sample_var_2,
-        "label": "CH2/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch2_sample_var_16,
-        "label": "CH2/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch3_sample_var,
-        "label": "CH3",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch3_sample_var_2,
-        "label": "CH3/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch3_sample_var_16,
-        "label": "CH3/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch4_sample_var,
-        "label": "CH4",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch4_sample_var_2,
-        "label": "CH4/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch4_sample_var_16,
-        "label": "CH4/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
-    
-    data1 = {
-        "data": ch5_sample_var,
-        "label": "CH5",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch5_sample_var_2,
-        "label": "CH5/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch5_sample_var_16,
-        "label": "CH5/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Wariancja próbki dla różnej skali")
+    drawPlotXD(data1, data2, data3, over_laid=False, xlabel="Próbka", ylabel="Wartość", title="Wartość średnia z próbki 1 sekunda")
     
     
-    data1 = {
-        "data": ch1_zero_cross,
-        "label": "CH1",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch1_zero_cross_2,
-        "label": "CH1/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch1_zero_cross_16,
-        "label": "CH1/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
-    
-    data1 = {
-        "data": ch2_zero_cross,
-        "label": "CH2",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch2_zero_cross_2,
-        "label": "CH2/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch2_zero_cross_16,
-        "label": "CH2/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
-    
-    data1 = {
-        "data": ch3_zero_cross,
-        "label": "CH3",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch3_zero_cross_2,
-        "label": "CH3/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch3_zero_cross_16,
-        "label": "CH3/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
-    
-    data1 = {
-        "data": ch4_zero_cross,
-        "label": "CH4",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch4_zero_cross_2,
-        "label": "CH4/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch4_zero_cross_16,
-        "label": "CH4/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
-    
-    data1 = {
-        "data": ch5_zero_cross,
-        "label": "CH5",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch5_zero_cross_2,
-        "label": "CH5/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch5_zero_cross_16,
-        "label": "CH5/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście pochodnej przez 0 dla różnej skali")
-    
-    data1 = {
-        "data": ch1_mean_cross,
-        "label": "CH1",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch1_mean_cross_2,
-        "label": "CH1/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch1_mean_cross_16,
-        "label": "CH1/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
-    
-    data1 = {
-        "data": ch2_mean_cross,
-        "label": "CH2",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch2_mean_cross_2,
-        "label": "CH2/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch2_mean_cross_16,
-        "label": "CH2/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
-    
-    data1 = {
-        "data": ch3_mean_cross,
-        "label": "CH3",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch3_mean_cross_2,
-        "label": "CH3/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch3_mean_cross_16,
-        "label": "CH3/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
-    
-    data1 = {
-        "data": ch4_mean_cross,
-        "label": "CH4",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch4_mean_cross_2,
-        "label": "CH4/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch4_mean_cross_16,
-        "label": "CH4/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
-    
-    data1 = {
-        "data": ch5_mean_cross,
-        "label": "CH5",
-        "color": "red"
-    }
-    
-    data2 = {
-        "data": ch5_mean_cross_2,
-        "label": "CH5/2",
-        "color": "green"
-    }
-    
-    data3 = {
-        "data": ch5_mean_cross_16,
-        "label": "CH5/16",
-        "color": "blue"
-    }
-    drawPlotXD(data1, data2, data3, over_laid= False, title="Przejście przez wartosć średnią dla różnej skali")
-    
+    print(f"""
+          Próbkowanie 8KS
+            CH1
+                Średnia: {K8_data["ch1"]["mean"]["mean"]}
+                Wariancja: {K8_data["ch1"]["var"]["mean"]}
+                Cross pochodna: {K8_data["ch1"]["diff0"]["mean"]}
+                Cross średnia: {K8_data["ch1"]["mean_cross"]["mean"]}
+          Próbkowanie 2KS
+            CH1
+                Średnia: {K2_data["ch1"]["mean"]["mean"]}
+                Wariancja: {K2_data["ch1"]["var"]["mean"]}
+                Cross pochodna: {K2_data["ch1"]["diff0"]["mean"]}
+                Cross średnia: {K2_data["ch1"]["mean_cross"]["mean"]}
+          Próbkowanie 0,5KS
+            CH1
+                Średnia: {K05_data["ch1"]["mean"]["mean"]}
+                Wariancja: {K05_data["ch1"]["var"]["mean"]}
+                Cross pochodna: {K05_data["ch1"]["diff0"]["mean"]}
+                Cross średnia: {K05_data["ch1"]["mean_cross"]["mean"]}
+          """)
+
+        
     logger.info(f"Run time {round(perf_counter() - start_time, 4)}s")
     
 if __name__ == "__main__":
     main()
 # %%
-
